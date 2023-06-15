@@ -12,18 +12,26 @@ export const handleSummit = async (data: unknown) => {
   return await res.json();
 };
 
-export const putConfigToOrigin = async (data: string) => {
-  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/xml" },
-    body: data,
+export const getStatusFromOrigin = async (): Promise<StatusDataType> => {
+  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/status`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
   });
-  return await res.text();
+  return await res.json();
 };
 
 export const getConfigFromOrigin = async () => {
   let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "GET",
+  });
+  return await res.text();
+};
+
+export const putConfigToOrigin = async (data: string) => {
+  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/xml" },
+    body: data,
   });
   return await res.text();
 };

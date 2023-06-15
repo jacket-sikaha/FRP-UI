@@ -31,3 +31,20 @@ declare type confDataType = {
   frps: FrpsDataType[];
   frpc: FrpcDataType[];
 };
+
+declare interface StatusDataType {
+  http: StatusTableDataType[];
+  https: StatusTableDataType[];
+  tcp: StatusTableDataType[];
+}
+
+declare type StatusTableDataType = {
+  key: React.Key;
+  err: string;
+  local_addr: string;
+  name: string;
+  plugin: string;
+  remote_addr: string;
+  status: string;
+  type: string;
+};

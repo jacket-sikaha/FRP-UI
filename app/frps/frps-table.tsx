@@ -15,13 +15,16 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { handleSummit } from "#/lib/server-action";
+import { validateSpecialCharsOrRepeated } from "#/lib/pauseData";
 
 export function FrpsTable({ result }: { result: confDataType }) {
   const [dataSource, setDataSource] = useState<FrpsDataType[]>(result.frps);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
-
+  const inputRule = [
+    { required: true, message: "Please input!", whitespace: true },
+  ];
   const handleEdit = (obj: FrpsDataType) => {
     // ！！！状态更新时调用setFieldValue需要注意，要等表单组件渲染完成再进行更新表单数据，不然就会被覆盖掉
     //     表单组件未正确地渲染出来。
@@ -142,28 +145,28 @@ export function FrpsTable({ result }: { result: confDataType }) {
           <Form.Item
             label="服务器端IP地址"
             name="server_addr"
-            rules={[{ required: true, message: "Please input!" }]}
+            rules={inputRule}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="服务器通信端口"
             name="server_port"
-            rules={[{ required: true, message: "Please input!" }]}
+            rules={inputRule}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="原生WEB客户端IP地址"
             name="admin_addr"
-            rules={[{ required: true, message: "Please input!" }]}
+            rules={inputRule}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="原生WEB客户端端口"
             name="admin_port"
-            rules={[{ required: true, message: "Please input!" }]}
+            rules={inputRule}
           >
             <Input />
           </Form.Item>
@@ -183,14 +186,51 @@ export function FrpsTable({ result }: { result: confDataType }) {
                         // 对应Field name大致为 ['optional', 3, 'label']
                         // 因此 获取Form.List某个具体field值可以这么拿  getFieldValue(["optional", 0, "label"])
                         name={[name, "label"]}
-                        rules={[{ required: true, message: "补充缺失内容" }]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "补充缺失内容",
+                            whitespace: true,
+                          },
+                          ({ getFieldValue }) => ({
+                            async validator(_, value, callback) {
+                              if (!value || !value.trim())
+                                return Promise.resolve();
+                              const labelList = getFieldValue("optional").map(
+                                (obj: { label: string; value: string }) =>
+                                  obj.label
+                              );
+                              const { size } = new Set(labelList);
+                              if (
+                                validateSpecialCharsOrRepeated(
+                                  labelList.length,
+                                  size
+                                )
+                              )
+                                return Promise.reject(
+                                  new Error("非必填区域不允许有重复的字段名称")
+                                );
+
+                              if (validateSpecialCharsOrRepeated(value))
+                                return Promise.reject(
+                                  new Error("不能含有特殊字符或中文")
+                                );
+                            },
+                          }),
+                        ]}
                       >
                         <Input placeholder="参数名" />
                       </Form.Item>
                       <Form.Item
                         {...restField}
                         name={[name, "value"]}
-                        rules={[{ required: true, message: "补充缺失内容" }]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "补充缺失内容",
+                            whitespace: true,
+                          },
+                        ]}
                       >
                         <Input placeholder="参数值" />
                       </Form.Item>

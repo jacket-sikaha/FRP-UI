@@ -20,7 +20,7 @@
   local_port = （内网主机端口）
   remote_port = （远端端口）
 
-  ​ frpc-name = 配置名称 **不能有中文**
+   frpc-name = 配置名称 **不能有中文**
 
 - FRP 配置文件编辑
 
@@ -84,3 +84,4 @@ local_port = 8889
 vhost_http_port = 80
 vhost_https_port = 443
 custom_domains = xxxxxxxxxxxx
+

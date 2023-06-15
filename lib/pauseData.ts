@@ -16,6 +16,9 @@ const necessaryArrays = [
   "vhost_https_port",
 ];
 
+export const patternOne = /[`~!@#$%^&*()+={}[\]\\|:;'",<>/?]/g;
+export const patternTwo = /[\u4e00-\u9fa5]/g;
+
 export function pauseToJSON(params: string) {
   let index = -1;
   let nameArr: any[] = [];
@@ -72,3 +75,13 @@ export function JsonToFrps(params: FrpsDataType[]): string {
   });
   return res.join("");
 }
+
+export const validateSpecialCharsOrRepeated = (
+  value: string | number,
+  length?: number
+) => {
+  if (typeof value === "string")
+    return patternOne.test(value) || patternTwo.test(value);
+
+  return value !== length;
+};

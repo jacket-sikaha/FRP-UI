@@ -31,8 +31,8 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body style={{ margin: 0, padding: 0 }}>
-        <Layout style={{ height: "100vh" }}>
+      <body>
+        <Layout style={{ height: "98vh" }}>
           <Sider breakpoint="lg" collapsedWidth="0">
             <h1
               style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}
@@ -43,7 +43,7 @@ export default function RootLayout({
             <Menu
               theme="dark"
               mode="inline"
-              defaultSelectedKeys={["2"]}
+              defaultSelectedKeys={["1"]}
               items={[
                 {
                   key: "1",

@@ -16,6 +16,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import { patternTwo, validateSpecialCharsOrRepeated } from "#/lib/pauseData";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState<FrpcDataType[]>([]);
@@ -25,8 +26,7 @@ export default function Page() {
   const editKEY = useRef<React.Key>();
   const storeFrpConf = useRef<confDataType>({ frpc: [], frps: [] });
   const nameMap = useRef<Map<string, FrpcDataType>>();
-  const patternOne = /[-`~!@#$%^&*()_+={}[\]\\|:;'",.<>/?]/g;
-  const patternTwo = /[\u4e00-\u9fa5]/g;
+
   const queryClient = useQueryClient();
   // 查询
   const { data, isFetching } = useQuery({
@@ -39,7 +39,6 @@ export default function Page() {
       setDataSource(result.frpc);
     },
   });
-
   // 修改
   const mutation = useMutation({
     mutationFn: (data: unknown) =>
@@ -48,9 +47,13 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       // 错误处理和刷新
       queryClient.invalidateQueries(["frpc"]);
+      message.success(data.status);
+    },
+    onError(error: any) {
+      message.error(error.status);
     },
   });
 
@@ -58,6 +61,28 @@ export default function Page() {
     const newData = dataSource.filter((item) => item.key !== key);
     setDataSource(newData);
     mutation.mutate([...storeFrpConf.current?.frps, ...newData]);
+  };
+
+  const validateName = async (
+    _: any,
+    value: string,
+    callback: (error?: string | undefined) => void
+  ) => {
+    try {
+      if (!value || !value.trim()) return Promise.resolve();
+      if (patternTwo.test(value))
+        return Promise.reject(new Error("不允许含有中文"));
+      if (isAdd && nameMap.current?.has(value))
+        return Promise.reject(new Error("不允许有重复的配置名称"));
+      if (
+        !isAdd &&
+        nameMap.current?.has(value) &&
+        nameMap.current?.get(value)?.key !== editKEY.current
+      )
+        return Promise.reject(new Error("不允许有重复的配置名称"));
+    } catch (error: any) {
+      callback(error);
+    }
   };
 
   const handleSelectChange = (value: string, record: FrpcDataType) => {
@@ -120,7 +145,6 @@ export default function Page() {
   };
 
   const onFinish = (values: FrpcDataType) => {
-    console.log("Received values of form:", values);
     switch (values.type) {
       case "http":
         values.vhost_http_port = values.remote_port;
@@ -231,7 +255,7 @@ export default function Page() {
         bordered
         dataSource={dataSource}
         columns={defaultColumns}
-        scroll={{ y: 600 }}
+        scroll={{ y: 650 }}
         loading={isFetching}
       />
       <Modal
@@ -267,19 +291,7 @@ export default function Page() {
                 whitespace: true,
               },
               {
-                validator: (_, value) => {
-                  if (!value || !value.trim()) return Promise.resolve();
-                  if (patternTwo.test(value))
-                    return Promise.reject(new Error("不允许含有中文"));
-                  if (isAdd && nameMap.current?.has(value))
-                    return Promise.reject(new Error("不允许有重复的配置名称"));
-                  if (
-                    !isAdd &&
-                    nameMap.current?.has(value) &&
-                    nameMap.current?.get(value)?.key !== editKEY.current
-                  )
-                    return Promise.reject(new Error("不允许有重复的配置名称"));
-                },
+                validator: validateName,
               },
             ]}
           >
@@ -344,7 +356,7 @@ export default function Page() {
                           whitespace: true,
                         },
                         ({ getFieldValue }) => ({
-                          validator(_, value) {
+                          async validator(_, value, callback) {
                             if (!value || !value.trim())
                               return Promise.resolve();
                             const labelList = getFieldValue("optional").map(
@@ -352,17 +364,19 @@ export default function Page() {
                                 obj.label
                             );
                             const { size } = new Set(labelList);
-                            if (labelList.length !== size)
+                            if (
+                              validateSpecialCharsOrRepeated(
+                                labelList.length,
+                                size
+                              )
+                            )
                               return Promise.reject(
                                 new Error("非必填区域不允许有重复的字段名称")
                               );
 
-                            if (
-                              patternOne.test(value) ||
-                              patternTwo.test(value)
-                            )
+                            if (validateSpecialCharsOrRepeated(value))
                               return Promise.reject(
-                                new Error("含有特殊字符或中文")
+                                new Error("不能含有特殊字符或中文")
                               );
                           },
                         }),
