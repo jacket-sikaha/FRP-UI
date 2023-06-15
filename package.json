@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
+    "dev2": "next dev --turbo",
     "lint": "next lint",
     "lint-staged": "lint-staged",
     "prettier": "prettier --write --ignore-unknown .",
@@ -27,6 +28,7 @@
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-query": "3.39.3",
     "server-only": "0.0.1",
     "styled-components": "6.0.0-beta.2",
     "use-count-up": "3.0.1"

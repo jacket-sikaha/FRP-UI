@@ -39,3 +39,6 @@ next-env.d.ts
 .vscode
 styles/dist.css
 package-lock.json
+lib/test.txt
+lib/test2.txt
+.env
