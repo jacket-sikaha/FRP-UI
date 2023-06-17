@@ -76,6 +76,14 @@ export function JsonToFrps(params: FrpsDataType[]): string {
   return res.join("");
 }
 
+export const MapToObj = (map: Map<string, string[]>) => {
+  let opj: { [key: string]: any } = {};
+  map.forEach((val, key) => {
+    opj[key] = val;
+  });
+  return opj;
+};
+
 export const validateSpecialCharsOrRepeated = (
   value: string | number,
   length?: number

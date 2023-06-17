@@ -16,38 +16,38 @@ export default function Home() {
 
   const defaultColumns: ColumnsType<StatusTableDataType> = [
     {
-      title: "name",
+      title: "配置名称",
       dataIndex: "name",
       // 都按照字符串的 Unicode 编码顺序 进行比较
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: "type",
+      title: "协议类型",
       dataIndex: "type",
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
-      title: "local_addr",
+      title: "本地地址",
       dataIndex: "local_addr",
       sorter: (a, b) => a.local_addr.localeCompare(b.local_addr),
     },
+    // {
+    //   title: "plugin",
+    //   dataIndex: "plugin",
+    //   sorter: (a, b) => a.plugin.localeCompare(b.plugin),
+    // },
     {
-      title: "plugin",
-      dataIndex: "plugin",
-      sorter: (a, b) => a.plugin.localeCompare(b.plugin),
-    },
-    {
-      title: "remote_addr",
+      title: "远程地址",
       dataIndex: "remote_addr",
       sorter: (a, b) => a.remote_addr.localeCompare(b.remote_addr),
     },
     {
-      title: "status",
+      title: "状态",
       dataIndex: "status",
       sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
-      title: "info",
+      title: "信息",
       dataIndex: "err",
     },
   ];

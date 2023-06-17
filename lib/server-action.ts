@@ -1,8 +1,6 @@
 "use server";
 // 对于提交请求这种自定义的请求函数需要在client组件里使用，需要使用server action这种配置写法
 
-import fs from "fs";
-
 export const handleSummit = async (data: unknown) => {
   let res = await fetch(`${process.env.LOCAL_SERVER}/api/putConf`, {
     method: "PUT",
@@ -41,7 +39,17 @@ export const reloadConfig = async () => {
   return await res.text();
 };
 
-// 没有文件也会自动创建
-export const updateFile = async (path: string, newData: string) => {
-  fs.writeFileSync(path, newData);
+// JSON
+export const readOptJSON = async (): Promise<Map<string, string[]>> => {
+  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`);
+  return await res.json();
+};
+
+export const updateOptJSON = async (data: unknown) => {
+  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return await res.json();
 };

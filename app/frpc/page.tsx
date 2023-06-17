@@ -2,6 +2,7 @@
 
 import React, { use, useEffect, useRef, useState } from "react";
 import {
+  AutoComplete,
   Button,
   Form,
   Input,
@@ -16,7 +17,12 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { patternTwo, validateSpecialCharsOrRepeated } from "#/lib/pauseData";
+import {
+  MapToObj,
+  patternTwo,
+  validateSpecialCharsOrRepeated,
+} from "#/lib/pauseData";
+import { handleSummit, readOptJSON, updateOptJSON } from "#/lib/server-action";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState<FrpcDataType[]>([]);
@@ -26,6 +32,7 @@ export default function Page() {
   const editKEY = useRef<React.Key>();
   const storeFrpConf = useRef<confDataType>({ frpc: [], frps: [] });
   const nameMap = useRef<Map<string, FrpcDataType>>();
+  const autoCompleteMap = useRef<Map<string, string[]>>();
 
   const queryClient = useQueryClient();
   // 查询
@@ -35,31 +42,37 @@ export default function Page() {
     async onSuccess(data) {
       const { result }: { result: confDataType } = await data.json();
       storeFrpConf.current = result;
+      // editKEY.current = undefined;
       nameMap.current = new Map(result.frpc.map((obj) => [obj.name, obj]));
       setDataSource(result.frpc);
     },
   });
   // 修改
   const mutation = useMutation({
-    mutationFn: (data: unknown) =>
-      fetch("http://localhost:3000/api/putConf", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }),
+    mutationFn: (data: unknown) => handleSummit(data),
     onSuccess: (data) => {
+      setIsAdd(false);
       // 错误处理和刷新
       queryClient.invalidateQueries(["frpc"]);
+      queryClient.invalidateQueries(["OPT"]);
       message.success(data.status);
     },
     onError(error: any) {
       message.error(error.status);
     },
   });
+  const autoCompleteList = useQuery({
+    queryKey: ["OPT"],
+    queryFn: () => readOptJSON(),
+    onSuccess(data) {
+      autoCompleteMap.current = new Map(Object.entries(data));
+    },
+  });
 
   const handleDelete = (key: React.Key) => {
     const newData = dataSource.filter((item) => item.key !== key);
-    setDataSource(newData);
+    let delObj: FrpcDataType = dataSource.find((item) => item.key == key)!;
+    handleOptUpdate(delObj, true);
     mutation.mutate([...storeFrpConf.current?.frps, ...newData]);
   };
 
@@ -74,6 +87,11 @@ export default function Page() {
         return Promise.reject(new Error("不允许含有中文"));
       if (isAdd && nameMap.current?.has(value))
         return Promise.reject(new Error("不允许有重复的配置名称"));
+      console.log(
+        "nameMap.current?.get(value)",
+        nameMap.current?.get(value),
+        editKEY.current
+      );
       if (
         !isAdd &&
         nameMap.current?.has(value) &&
@@ -92,7 +110,6 @@ export default function Page() {
       ...target,
     };
     temp.type = value;
-    console.log("temp", temp);
     switch (value) {
       case "http":
         temp.vhost_http_port = typeToShowValue(target);
@@ -144,7 +161,52 @@ export default function Page() {
     setIsModalOpen(true);
   };
 
+  const handleOptUpdate = async (value: FrpcDataType, isDel?: boolean) => {
+    let checkMap = autoCompleteMap.current!;
+    let oldObj = dataSource.find((obj) => obj.key === editKEY.current);
+    console.log("oldObj", oldObj);
+    let oldObjOptionLabel = new Set(
+      oldObj?.optional?.map(({ label }) => label)
+    );
+    // 只搜寻这次编辑有的option
+    value.optional?.forEach(({ label }) => {
+      // 留下被删除的老选项
+      oldObjOptionLabel.delete(label);
+      if (!checkMap?.has(label)) return;
+      if (isAdd) {
+        checkMap.set(label, [...checkMap.get(label)!, value.name]);
+        console.log("checkMap", checkMap);
+        return;
+      }
+      let nameSet = new Set(checkMap.get(label));
+      if (isDel) {
+        nameSet.delete(value.name ?? "");
+        checkMap.set(label, [...nameSet]);
+        return;
+      }
+      // 编辑状态对新字段进行更新删除---名字不变set自带去重直接添加，如果换成了新名字应该要删去旧名字
+      nameSet.add(value.name);
+      oldObj?.name !== value.name && nameSet.delete(oldObj?.name ?? "");
+      checkMap.set(label, [...nameSet]);
+    });
+    // 编辑删除掉选项会出现问题---需要找到编辑前被删除的选项
+    // 因为是按照新value去匹配
+    // 删掉的option就仍会保留在map里，导致 set 集合不能按要求删除
+    console.log("oldObjOptionLabel", oldObjOptionLabel);
+    !isAdd &&
+      !isDel &&
+      oldObjOptionLabel.forEach((key) => {
+        if (checkMap.has(key)) {
+          let nameSet = new Set(checkMap.get(key));
+          nameSet.delete(oldObj?.name ?? "");
+          checkMap.set(key, [...nameSet]);
+        }
+      });
+    await updateOptJSON(MapToObj(checkMap));
+  };
+
   const onFinish = (values: FrpcDataType) => {
+    console.log("values", values);
     switch (values.type) {
       case "http":
         values.vhost_http_port = values.remote_port;
@@ -157,13 +219,15 @@ export default function Page() {
       default:
         break;
     }
+    let newData: FrpcDataType[] = JSON.parse(JSON.stringify(dataSource));
     if (!isAdd) {
-      dataSource[dataSource.findIndex((obj) => obj.key === editKEY.current)] =
-        values;
+      newData[newData.findIndex((obj) => obj.key === editKEY.current)] = values;
     } else {
-      dataSource.push(values);
+      newData.push(values);
     }
-    mutation.mutate([...storeFrpConf.current?.frps, ...dataSource]);
+    handleOptUpdate(values);
+
+    mutation.mutate([...storeFrpConf.current?.frps, ...newData]);
     setIsModalOpen(false);
   };
 
@@ -233,6 +297,9 @@ export default function Page() {
               <Popconfirm
                 title="Sure to delete?"
                 onConfirm={() => handleDelete(record.key)}
+                onCancel={() => {
+                  setIsAdd(false);
+                }}
               >
                 <Button danger>删除</Button>
               </Popconfirm>
@@ -382,7 +449,15 @@ export default function Page() {
                         }),
                       ]}
                     >
-                      <Input placeholder="参数名" />
+                      <AutoComplete
+                        style={{ width: 200 }}
+                        options={[
+                          ...(autoCompleteMap.current?.keys() ?? []),
+                        ].map((str) => ({
+                          value: str,
+                        }))}
+                        placeholder="参数名"
+                      />
                     </Form.Item>
                     <Form.Item
                       {...restField}

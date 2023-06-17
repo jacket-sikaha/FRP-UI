@@ -1,9 +1,6 @@
+import { updateFile } from "#/lib/getBaseUrl";
 import { JsonToFrps } from "#/lib/pauseData";
-import {
-  putConfigToOrigin,
-  reloadConfig,
-  updateFile,
-} from "#/lib/server-action";
+import { putConfigToOrigin, reloadConfig } from "#/lib/server-action";
 import { NextResponse } from "next/server";
 import path from "node:path";
 
@@ -18,11 +15,11 @@ export async function PUT(request: Request, context: any) {
 
     console.log("data", data);
     let confText = JsonToFrps(data);
-    let res = await putConfigToOrigin(confText);
-    let ress = await reloadConfig();
+    // let res = await putConfigToOrigin(confText);
+    // let ress = await reloadConfig();
     updateFile(path.join(process.cwd(), "lib", "test.txt"), confText);
 
-    return NextResponse.json({ status: "success", ress, res });
+    return NextResponse.json({ status: "success" });
   } catch (error: any) {
     return NextResponse.json({ status: error.message });
   }

@@ -42,3 +42,4 @@ package-lock.json
 lib/test.txt
 lib/test2.txt
 .env
+lib/sql.ts

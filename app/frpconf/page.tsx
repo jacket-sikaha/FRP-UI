@@ -5,20 +5,17 @@ import {
   putConfigToOrigin,
   reloadConfig,
 } from "#/lib/server-action";
-import { Button, Form, Input, Spin, message } from "antd";
+import { Button, Form, Input, Space, Spin, message } from "antd";
 import { useQueryClient, useQuery, useMutation } from "react-query";
 
 const { TextArea } = Input;
 
-const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  console.log("Change:", e.target.value);
-};
 export default function Page() {
   const [form] = Form.useForm();
   const handleFileConfSummit = async (data: string) => {
     let res = await putConfigToOrigin(data);
-    let reloadRes = await reloadConfig();
-    return Promise.resolve({ res, reloadRes });
+
+    return Promise.resolve({ res });
   };
   const queryClient = useQueryClient();
   // 查询
@@ -33,7 +30,7 @@ export default function Page() {
   const mutation = useMutation({
     mutationFn: (data: string) => handleFileConfSummit(data),
     onSuccess: (data) => {
-      message.success(data.reloadRes);
+      message.success(data.res);
       queryClient.invalidateQueries(["frpconf"]);
     },
   });
@@ -44,6 +41,23 @@ export default function Page() {
       form={form}
       onFinish={(value) => mutation.mutate(value.frpconf)}
     >
+      <Form.Item>
+        <Space size={"large"}>
+          <Button type="primary" htmlType="submit" loading={mutation.isLoading}>
+            上传
+          </Button>
+          <Button
+            type="primary"
+            onClick={async () => {
+              let reloadRes = await reloadConfig();
+              message.success(reloadRes);
+            }}
+          >
+            重载
+          </Button>
+        </Space>
+      </Form.Item>
+
       <Spin tip="Loading" spinning={isFetching}>
         <Form.Item
           name="frpconf"
@@ -52,24 +66,14 @@ export default function Page() {
           <TextArea
             showCount
             style={{
-              width: 500,
-              height: 750,
+              fontSize: 20,
+              width: 600,
+              height: 700,
               resize: "none",
             }}
-            onChange={onChange}
           />
         </Form.Item>
       </Spin>
-      <Form.Item>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{ margin: ".3rem 20rem 0" }}
-          loading={mutation.isLoading}
-        >
-          提交
-        </Button>
-      </Form.Item>
     </Form>
   );
 }
