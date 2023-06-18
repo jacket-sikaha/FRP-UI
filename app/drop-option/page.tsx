@@ -1,11 +1,7 @@
 "use client";
 import { optJSONPath } from "#/lib/getBaseUrl";
 import { MapToObj } from "#/lib/pauseData";
-import {
-  getConfigFromOrigin,
-  readOptJSON,
-  updateOptJSON,
-} from "#/lib/server-action";
+import { readOptJSON, updateOptJSON } from "#/lib/server-action";
 import { DeleteOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -21,8 +17,7 @@ import {
   message,
   Tag,
 } from "antd";
-import form from "antd/es/form";
-import { HtmlHTMLAttributes, ReactElement, useEffect, useState } from "react";
+import { useState } from "react";
 import { useQueryClient, useQuery, useMutation } from "react-query";
 const { Panel } = Collapse;
 

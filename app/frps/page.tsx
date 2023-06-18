@@ -2,7 +2,7 @@ import React from "react";
 import { FrpsTable } from "./frps-table";
 import { handleSummit } from "#/lib/server-action";
 async function getFrpsAndFrpc() {
-  const res = await fetch("http://localhost:3000/api/frp", {
+  const res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
     // next: { revalidate: 0, tags: ["collection"] },
     // cache: "no-store",
     // cache: "force-cache",

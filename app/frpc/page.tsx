@@ -38,7 +38,7 @@ export default function Page() {
   // 查询
   const { data, isFetching } = useQuery({
     queryKey: ["frpc"],
-    queryFn: () => fetch("http://localhost:3000/api/frp"),
+    queryFn: () => fetch(`${process.env.LOCAL_SERVER}/api/frp`),
     async onSuccess(data) {
       const { result }: { result: confDataType } = await data.json();
       storeFrpConf.current = result;
