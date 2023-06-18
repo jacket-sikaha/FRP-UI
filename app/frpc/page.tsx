@@ -42,7 +42,6 @@ export default function Page() {
     async onSuccess(data) {
       const { result }: { result: confDataType } = await data.json();
       storeFrpConf.current = result;
-      // editKEY.current = undefined;
       nameMap.current = new Map(result.frpc.map((obj) => [obj.name, obj]));
       setDataSource(result.frpc);
     },
@@ -87,11 +86,6 @@ export default function Page() {
         return Promise.reject(new Error("不允许含有中文"));
       if (isAdd && nameMap.current?.has(value))
         return Promise.reject(new Error("不允许有重复的配置名称"));
-      console.log(
-        "nameMap.current?.get(value)",
-        nameMap.current?.get(value),
-        editKEY.current
-      );
       if (
         !isAdd &&
         nameMap.current?.has(value) &&

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  AutoComplete,
   Button,
   Form,
   Input,
@@ -16,20 +15,28 @@ import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { handleSummit } from "#/lib/server-action";
 import { validateSpecialCharsOrRepeated } from "#/lib/pauseData";
+import { useRouter } from "next/navigation";
 
-export function FrpsTable({ result }: { result: confDataType }) {
-  const [dataSource, setDataSource] = useState<FrpsDataType[]>(result.frps);
+type FrpsTableProps = {
+  frps: FrpsDataType[];
+  frpc: FrpcDataType[];
+  handleSwitchChange: Function;
+};
+
+export function FrpsTable({ frps, frpc, handleSwitchChange }: FrpsTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  const router = useRouter();
+  const storeFrpc = useRef(frpc);
   const inputRule = [
     { required: true, message: "Please input!", whitespace: true },
   ];
+
   const handleEdit = (obj: FrpsDataType) => {
     // ！！！状态更新时调用setFieldValue需要注意，要等表单组件渲染完成再进行更新表单数据，不然就会被覆盖掉
     //     表单组件未正确地渲染出来。
     // 当表单组件未正确地挂载到 DOM 树上，或者在调用 setFieldsValue() 方法时表单组件还没渲染好 / 已经被卸载时，setFieldsValue() 方法也会失效。你可以使用类似 setTimeout() 的方法在稍后的时间再次调用 setFieldsValue() 方法。
-    // form.setFieldValue("optional", []);
     setTimeout(() => {
       form.setFieldsValue({
         ...obj,
@@ -42,23 +49,26 @@ export function FrpsTable({ result }: { result: confDataType }) {
   // console.log("age", age);
 
   const handleOk = () => {
-    // setConfirmLoading(true);
-    console.log({ ...form.getFieldsValue(), name: "common" });
-    // form
-    //   .validateFields()
-    //   .then(async () => {
-    //     let { status } = await handleSummit([
-    //       { ...form.getFieldsValue(), name: "common" },
-    //       ...result.frpc,
-    //     ]);
-    //     setConfirmLoading(false);
-    //     setIsModalOpen(false);
-    //     message.success(status);
-    //   })
-    //   .catch((error: any) => {
-    //     setConfirmLoading(false);
-    //     message.error(error.message);
-    //   });
+    setConfirmLoading(true);
+    form
+      .validateFields()
+      .then(async () => {
+        // 客户端组件里发送请求的方法 1 ，也可以是自己封装一个server-action导入使用
+        let { status } = await handleSummit([
+          { ...form.getFieldsValue(), name: "common" },
+          ...storeFrpc.current,
+        ]);
+        form.resetFields();
+        setConfirmLoading(false);
+        setIsModalOpen(false);
+        message.success(status || "success");
+        // 手动重新请求获取
+        router.refresh();
+      })
+      .catch((error: any) => {
+        setConfirmLoading(false);
+        message.error(error.message);
+      });
   };
 
   const defaultColumns: ColumnsType<FrpsDataType> = [
@@ -80,13 +90,14 @@ export function FrpsTable({ result }: { result: confDataType }) {
             checkedChildren="开启"
             unCheckedChildren="关闭"
             checked={record.isWork}
-            onChange={() => {
-              let target =
-                dataSource[
-                  dataSource.findIndex((item) => item.key == record.key)
-                ];
-              target.isWork = !record.isWork;
-              setDataSource([...dataSource]);
+            onChange={async (value) => {
+              // 客户端组件里发送请求的方法 2 还可以是导入父组件配置好的服务端函数使用
+              const { status } = await handleSwitchChange([
+                { ...frps[0], isWork: value },
+                ...storeFrpc.current,
+              ]);
+              message.success(status);
+              router.refresh();
             }}
           />
         );
@@ -96,7 +107,7 @@ export function FrpsTable({ result }: { result: confDataType }) {
       title: "操作",
       dataIndex: "operation",
       render: (_, record: FrpsDataType) =>
-        dataSource.length >= 1 ? (
+        frps.length >= 1 ? (
           <>
             <Space>
               <Button onClick={() => handleEdit(record)}>编辑</Button>
@@ -109,13 +120,13 @@ export function FrpsTable({ result }: { result: confDataType }) {
     <>
       <Table
         bordered
-        dataSource={dataSource}
+        dataSource={frps}
         columns={defaultColumns}
         rowKey={"server_addr"}
       />
       <Modal
         title="编辑"
-        forceRender
+        // forceRender
         // destroyOnClose
         open={isModalOpen}
         confirmLoading={confirmLoading}
@@ -125,11 +136,6 @@ export function FrpsTable({ result }: { result: confDataType }) {
         }}
         okText="修改"
         cancelText="取消"
-        afterOpenChange={(open) => {
-          if (!open) {
-            form.resetFields();
-          }
-        }}
       >
         <Form
           // preserve={false}

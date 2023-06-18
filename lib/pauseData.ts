@@ -76,6 +76,29 @@ export function JsonToFrps(params: FrpsDataType[]): string {
   return res.join("");
 }
 
+export function frpPauseToNewOptionMap(
+  params: string,
+  optKey: string[]
+): Map<string, string[]> {
+  let index = "";
+  let newMap = new Map<string, string[]>();
+  params.split(/[\r\n]+/gm).forEach((str) => {
+    if (!str) return;
+    if (str.indexOf("=") !== -1) {
+      str = str.replace(/\#/gm, "");
+      let label = str.slice(0, str.indexOf("=")).trim();
+      if (necessaryArrays.includes(label)) return;
+      if (optKey.includes(label)) {
+        newMap.set(label, [...(newMap.get(label) ?? []), index]);
+      }
+    } else {
+      let name = str.slice(str.search(/\[.+\]$/gm) + 1, -1).trim();
+      index = name;
+    }
+  });
+  return newMap;
+}
+
 export const MapToObj = (map: Map<string, string[]>) => {
   let opj: { [key: string]: any } = {};
   map.forEach((val, key) => {

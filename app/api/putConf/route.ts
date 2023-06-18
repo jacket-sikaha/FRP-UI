@@ -1,10 +1,11 @@
 import { updateFile } from "#/lib/getBaseUrl";
 import { JsonToFrps } from "#/lib/pauseData";
 import { putConfigToOrigin, reloadConfig } from "#/lib/server-action";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import path from "node:path";
+import { revalidateTag } from "next/cache";
 
-export async function PUT(request: Request, context: any) {
+export async function PUT(request: NextRequest, context: any) {
   try {
     // 获取json数据
     let data = await request.json();
@@ -13,7 +14,6 @@ export async function PUT(request: Request, context: any) {
     //   console.log(key, value);
     // });
 
-    console.log("data", data);
     let confText = JsonToFrps(data);
     // let res = await putConfigToOrigin(confText);
     // let ress = await reloadConfig();

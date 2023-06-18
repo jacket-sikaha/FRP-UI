@@ -160,6 +160,7 @@ export default function Page() {
       <div
         style={{
           margin: ".6rem auto",
+          maxWidth: "90%",
           maxHeight: "85%",
           overflow: "auto",
         }}
@@ -170,7 +171,14 @@ export default function Page() {
               <Panel
                 header={
                   <Space wrap>
-                    <h3>{name}</h3>
+                    <h3
+                      style={{
+                        wordWrap: "break-word" /* 强制自动换行 */,
+                        // maxWidth: "1rem" /* 自适应父容器宽度 */,
+                      }}
+                    >
+                      {name}
+                    </h3>
                     <div>
                       <Tag color="#2db7f5">使用人数：</Tag>
                       {option.get(name)?.length}
