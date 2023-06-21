@@ -19,11 +19,11 @@ export default function Page() {
   const checkMap = useRef<Map<string, string[]>>();
 
   const handleFileConfSummit = async (data: string) => {
-    // let res = await putConfigToOrigin(data);
+    let res = await putConfigToOrigin(data);
     console.log("res", data);
     let newMap = frpPauseToNewOptionMap(data, [...checkMap.current?.keys()!]);
     await updateOptJSON(MapToObj(newMap));
-    return Promise.resolve({ res: 1 });
+    return Promise.resolve({ res });
   };
 
   const queryClient = useQueryClient();

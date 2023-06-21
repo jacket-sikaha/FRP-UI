@@ -1,13 +1,14 @@
 import React from "react";
 import { FrpsTable } from "./frps-table";
-import { handleSummit } from "#/lib/server-action";
+import { getConfigFromLocal, handleSummit } from "#/lib/server-action";
 async function getFrpsAndFrpc() {
-  const res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
-    // next: { revalidate: 0, tags: ["collection"] },
-    // cache: "no-store",
-    // cache: "force-cache",
-  });
-  return res.json();
+  // const res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
+  // next: { revalidate: 0, tags: ["collection"] },
+  // cache: "no-store",
+  // cache: "force-cache",
+  // });
+  const res = await getConfigFromLocal();
+  return res;
 }
 
 async function handleSwitchChange(data: any) {

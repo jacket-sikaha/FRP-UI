@@ -14,6 +14,15 @@ export const getStatusFromOrigin = async (): Promise<StatusDataType> => {
   let res = await fetch(`${process.env.ORIGIN_SERVER}/api/status`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  return await res.json();
+};
+
+export const getConfigFromLocal = async () => {
+  let res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
+    method: "GET",
+    cache: "no-store",
   });
   return await res.json();
 };
@@ -21,6 +30,7 @@ export const getStatusFromOrigin = async (): Promise<StatusDataType> => {
 export const getConfigFromOrigin = async () => {
   let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "GET",
+    cache: "no-store",
   });
   return await res.text();
 };
@@ -41,7 +51,9 @@ export const reloadConfig = async () => {
 
 // JSON
 export const readOptJSON = async (): Promise<Map<string, string[]>> => {
-  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`);
+  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`, {
+    cache: "no-store",
+  });
   return await res.json();
 };
 
@@ -50,6 +62,7 @@ export const updateOptJSON = async (data: unknown) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    cache: "no-store",
   });
   return await res.json();
 };

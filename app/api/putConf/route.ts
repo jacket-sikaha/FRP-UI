@@ -3,7 +3,7 @@ import { JsonToFrps } from "#/lib/pauseData";
 import { putConfigToOrigin, reloadConfig } from "#/lib/server-action";
 import { NextRequest, NextResponse } from "next/server";
 import path from "node:path";
-import { revalidateTag } from "next/cache";
+
 
 export async function PUT(request: NextRequest, context: any) {
   try {
@@ -15,8 +15,8 @@ export async function PUT(request: NextRequest, context: any) {
     // });
 
     let confText = JsonToFrps(data);
-    // let res = await putConfigToOrigin(confText);
-    // let ress = await reloadConfig();
+    let res = await putConfigToOrigin(confText);
+    let ress = await reloadConfig();
     updateFile(path.join(process.cwd(), "lib", "test.txt"), confText);
 
     return NextResponse.json({ status: "success" });

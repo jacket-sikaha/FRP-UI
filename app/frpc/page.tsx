@@ -22,7 +22,12 @@ import {
   patternTwo,
   validateSpecialCharsOrRepeated,
 } from "#/lib/pauseData";
-import { handleSummit, readOptJSON, updateOptJSON } from "#/lib/server-action";
+import {
+  getConfigFromLocal,
+  handleSummit,
+  readOptJSON,
+  updateOptJSON,
+} from "#/lib/server-action";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState<FrpcDataType[]>([]);
@@ -38,9 +43,9 @@ export default function Page() {
   // 查询
   const { data, isFetching } = useQuery({
     queryKey: ["frpc"],
-    queryFn: () => fetch(`${process.env.LOCAL_SERVER}/api/frp`),
+    queryFn: () => getConfigFromLocal(),
     async onSuccess(data) {
-      const { result }: { result: confDataType } = await data.json();
+      const { result }: { result: confDataType } = data;
       storeFrpConf.current = result;
       nameMap.current = new Map(result.frpc.map((obj) => [obj.name, obj]));
       setDataSource(result.frpc);
