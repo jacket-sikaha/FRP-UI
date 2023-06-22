@@ -166,9 +166,11 @@ export default function Page() {
     // 当表单组件未正确地挂载到 DOM 树上，或者在调用 setFieldsValue() 方法时表单组件还没渲染好 / 已经被卸载时，setFieldsValue() 方法也会失效。你可以使用类似 setTimeout() 的方法在稍后的时间再次调用 setFieldsValue() 方法。
     if (obj) {
       setTimeout(() => {
+        obj.optional = obj.optional?.filter((item) => item.labelIsWork);
         form.setFieldsValue({
           ...obj,
           remote_port: typeToShowValue(obj),
+          // asd11: [1, 2, 3, 3], // form里面不存在的field值就不能set成功
         });
       }, 300);
       editKEY.current = obj?.key;
@@ -226,7 +228,6 @@ export default function Page() {
   };
 
   const onFinish = (values: FrpcDataType) => {
-    console.log("values", values);
     switch (values.type) {
       case "http":
         values.vhost_http_port = values.remote_port;
@@ -241,12 +242,24 @@ export default function Page() {
     }
     let newData: FrpcDataType[] = JSON.parse(JSON.stringify(dataSource));
     if (!isAdd) {
-      newData[newData.findIndex((obj) => obj.key === editKEY.current)] = values;
+      let targetIndex = newData.findIndex((obj) => obj.key === editKEY.current);
+      let oldObj = newData[targetIndex];
+      values.optional = [
+        ...(values.optional ?? []).map((item) => ({
+          ...item,
+          labelIsWork: true,
+        })),
+        ...(oldObj.optional ?? []).filter((item) => !item.labelIsWork),
+      ];
+      newData[targetIndex] = values;
     } else {
+      values.optional = values.optional?.map((item) => ({
+        ...item,
+        labelIsWork: true,
+      }));
       newData.push(values);
     }
     handleOptUpdate(values);
-
     mutation.mutate([...storeFrpConf.current?.frps, ...newData]);
     setIsModalOpen(false);
   };
@@ -313,7 +326,10 @@ export default function Page() {
         dataSource.length >= 1 ? (
           <>
             <Space>
-              <Button onClick={() => handleAddOrEdit(record)}>编辑</Button>
+              {/* 需要对record的部分属性进行更改，为了不影响dataSource的值进行浅拷贝传递 */}
+              <Button onClick={() => handleAddOrEdit({ ...record })}>
+                编辑
+              </Button>
               <Popconfirm
                 title="Sure to delete?"
                 onConfirm={() => handleDelete(record.key)}

@@ -1,5 +1,5 @@
 declare interface FrpsDataType {
-  optional?: { label: string; value: string }[];
+  optional?: { labelIsWork: boolean; label: string; value: string }[];
   key: React.Key;
   token: string; //（服务端 token）
   server_addr: string; //（服务器端IP地址）
@@ -13,7 +13,11 @@ declare interface FrpsDataType {
 }
 
 declare interface FrpcDataType {
-  optional?: { label: string; value: string }[];
+  optional?: {
+    labelIsWork: boolean;
+    label: string;
+    value: string;
+  }[];
   key: React.Key;
   type: string; // （协议类型）
   local_ip: string; // （内网主机IP）

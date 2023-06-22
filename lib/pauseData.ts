@@ -27,7 +27,11 @@ export function pauseToJSON(params: string) {
     if (!str) return;
     if (str.indexOf("=") !== -1) {
       // 先看看键名是不是带注释的选项
-      let labelIsWork = str.slice(0, str.indexOf("=")).indexOf("#") === -1;
+      // 启用状态下 至少有一个# 才是 注释状态
+      // 非启用状态下 至少两个# 才是
+      let labelIsWork =
+        (str.slice(0, str.indexOf("=")).match(/#/g) ?? []).length >
+        (nameArr[index].isWork ? 0 : 1);
       str = str.replace(/\#/gm, "");
       let label = str.slice(0, str.indexOf("=")).trim();
       let value = str.slice(str.indexOf("=") + 1).trim();
@@ -35,7 +39,7 @@ export function pauseToJSON(params: string) {
         nameArr[index][label] = value;
         return;
       }
-      nameArr[index].optional.push({ label, value, labelIsWork });
+      nameArr[index].optional.push({ label, value, labelIsWork: !labelIsWork });
     } else {
       let name = str.slice(str.search(/\[.+\]$/gm) + 1, -1).trim();
       index++;
@@ -66,8 +70,11 @@ export function JsonToFrps(params: FrpsDataType[]): string {
 
   params.forEach((obj, index) => {
     let optionalStr = "";
-    obj?.optional?.forEach(({ label, value }) => {
-      optionalStr += `${obj.isWork ? "" : "# "}${label} = ${value}\r\n`;
+    obj?.optional?.forEach(({ label, value, labelIsWork }) => {
+      // 不启用的注释状态 + 原有就有选项注释 则是是## ，正常选项则按照必选选项根据是否启用的字段来控制
+      optionalStr += `${labelIsWork ? "" : "#"}${
+        obj.isWork ? "" : "# "
+      }${label} = ${value}\r\n`;
     });
     res[index] += optionalStr;
     // delete obj.optional;
