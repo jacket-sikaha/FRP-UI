@@ -27,7 +27,7 @@ export const getConfigFromLocal = async () => {
   return await res.json();
 };
 
-export const getConfigFromOrigin = async () => {
+export const getConfigFromOrigin = async (): Promise<string> => {
   let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "GET",
     cache: "no-store",

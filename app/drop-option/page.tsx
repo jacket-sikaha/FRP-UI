@@ -1,7 +1,10 @@
 "use client";
-import { optJSONPath } from "#/lib/getBaseUrl";
-import { MapToObj } from "#/lib/pauseData";
-import { readOptJSON, updateOptJSON } from "#/lib/server-action";
+import { MapToObj, frpPauseToNewOptionMap } from "#/lib/pauseData";
+import {
+  getConfigFromOrigin,
+  readOptJSON,
+  updateOptJSON,
+} from "#/lib/server-action";
 import { DeleteOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -16,6 +19,7 @@ import {
   Statistic,
   message,
   Tag,
+  MessageArgsProps,
 } from "antd";
 import { useState } from "react";
 import { useQueryClient, useQuery, useMutation } from "react-query";
@@ -36,36 +40,41 @@ export default function Page() {
   const { data, isFetching } = useQuery({
     queryKey: ["OPT"],
     queryFn: () => readOptJSON(),
-    onSuccess(data) {
-      console.log("data", data);
+    onSuccess(data: ArrayLike<string[]> | { [s: string]: string[] }) {
       setOption(new Map(Object.entries(data)));
     },
   });
   // 修改
   const mutation = useMutation({
     mutationFn: (data: unknown) => updateOptJSON(data),
-    onSuccess: (data) => {
+    onSuccess: (data: { res: string }) => {
       message.success(data.res);
       queryClient.invalidateQueries(["OPT"]);
     },
   });
 
-  const onCreate = (values: any) => {
+  const onCreate = async (values: any) => {
     option.set(values.optName, []);
-    mutation.mutate(MapToObj(option));
+    let confData = await getConfigFromOrigin();
+    let newMap = frpPauseToNewOptionMap(confData, [...option.keys()]);
+    mutation.mutate(MapToObj(newMap));
     setOpen(false);
   };
 
-  const handleDelete = (key: string) => {
+  const handleDelete = (key: string, num: number) => {
+    if (num > 0) {
+      message.error("选项还有人使用，不能删除！");
+      return;
+    }
     option.delete(key);
     return mutation.mutate(MapToObj(option));
   };
 
-  const genExtra = (key: string) => (
+  const genExtra = (key: string, num: number) => (
     <Popconfirm
       placement="topLeft"
       title="确定删除?"
-      onConfirm={() => handleDelete(key)}
+      onConfirm={() => handleDelete(key, num)}
     >
       <DeleteOutlined
         style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
@@ -104,11 +113,11 @@ export default function Page() {
         onOk={() => {
           form
             .validateFields()
-            .then((values) => {
+            .then((values: string) => {
               form.resetFields();
               onCreate(values);
             })
-            .catch((info) => {
+            .catch((info: any) => {
               console.log("Validate Failed:", info);
             });
         }}
@@ -182,7 +191,7 @@ export default function Page() {
                 }
                 showArrow={false}
                 key={name}
-                extra={genExtra(name)}
+                extra={genExtra(name, option.get(name)?.length)}
               >
                 <Space wrap size={10}>
                   {option.get(name)?.map((item) => (

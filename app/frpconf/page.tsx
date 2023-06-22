@@ -8,7 +8,15 @@ import {
   reloadConfig,
   updateOptJSON,
 } from "#/lib/server-action";
-import { Button, Form, Input, Space, Spin, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  MessageArgsProps,
+  Space,
+  Spin,
+  message,
+} from "antd";
 import { useRef } from "react";
 import { useQueryClient, useQuery, useMutation } from "react-query";
 
@@ -31,21 +39,21 @@ export default function Page() {
   const { data, isFetching } = useQuery({
     queryKey: ["frpconf"],
     queryFn: () => getConfigFromOrigin(),
-    async onSuccess(data) {
+    async onSuccess(data: string) {
       form.setFieldValue("frpconf", data);
     },
   });
   const autoCompleteList = useQuery({
     queryKey: ["OPT"],
     queryFn: () => readOptJSON(),
-    onSuccess(data) {
+    onSuccess(data: { [s: string]: string[] } | ArrayLike<string[]>) {
       checkMap.current = new Map(Object.entries(data));
     },
   });
   // 修改
   const mutation = useMutation({
     mutationFn: (data: string) => handleFileConfSummit(data),
-    onSuccess: (data) => {
+    onSuccess: (data: { res: string }) => {
       queryClient.invalidateQueries(["frpconf"]);
       queryClient.invalidateQueries(["OPT"]);
       message.success(data.res);

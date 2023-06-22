@@ -18,6 +18,7 @@ const necessaryArrays = [
 
 export const patternOne = /[`~!@#$%^&*()+={}[\]\\|:;'",<>/?]/g;
 export const patternTwo = /[\u4e00-\u9fa5]/g;
+export const patternThree = /[a-zA-Z]+/gm;
 
 export function pauseToJSON(params: string) {
   let index = -1;
@@ -25,6 +26,8 @@ export function pauseToJSON(params: string) {
   params.split(/[\r\n]+/gm).forEach((str) => {
     if (!str) return;
     if (str.indexOf("=") !== -1) {
+      // 先看看键名是不是带注释的选项
+      let labelIsWork = str.slice(0, str.indexOf("=")).indexOf("#") === -1;
       str = str.replace(/\#/gm, "");
       let label = str.slice(0, str.indexOf("=")).trim();
       let value = str.slice(str.indexOf("=") + 1).trim();
@@ -32,7 +35,7 @@ export function pauseToJSON(params: string) {
         nameArr[index][label] = value;
         return;
       }
-      nameArr[index].optional.push({ label, value });
+      nameArr[index].optional.push({ label, value, labelIsWork });
     } else {
       let name = str.slice(str.search(/\[.+\]$/gm) + 1, -1).trim();
       index++;
@@ -81,7 +84,8 @@ export function frpPauseToNewOptionMap(
   optKey: string[]
 ): Map<string, string[]> {
   let index = "";
-  let newMap = new Map<string, string[]>();
+  // 文件编辑删掉的选项不能连选项实体也被删去了
+  let newMap = new Map<string, string[]>(optKey.map((key) => [key, []]));
   params.split(/[\r\n]+/gm).forEach((str) => {
     if (!str) return;
     if (str.indexOf("=") !== -1) {
@@ -89,7 +93,8 @@ export function frpPauseToNewOptionMap(
       let label = str.slice(0, str.indexOf("=")).trim();
       if (necessaryArrays.includes(label)) return;
       if (optKey.includes(label)) {
-        newMap.set(label, [...(newMap.get(label) ?? []), index]);
+        // 文件编辑可以手动添加重复的自选项，因此去重避免影响其他地方逻辑
+        newMap.set(label, [...new Set([...(newMap.get(label) ?? []), index])]);
       }
     } else {
       let name = str.slice(str.search(/\[.+\]$/gm) + 1, -1).trim();

@@ -19,6 +19,7 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   MapToObj,
+  patternThree,
   patternTwo,
   validateSpecialCharsOrRepeated,
 } from "#/lib/pauseData";
@@ -33,6 +34,11 @@ export default function Page() {
   const [dataSource, setDataSource] = useState<FrpcDataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
+  const inputRule = {
+    required: true,
+    message: "Please input!",
+    whitespace: true,
+  };
   const [form] = Form.useForm();
   const editKEY = useRef<React.Key>();
   const storeFrpConf = useRef<confDataType>({ frpc: [], frps: [] });
@@ -44,7 +50,7 @@ export default function Page() {
   const { data, isFetching } = useQuery({
     queryKey: ["frpc"],
     queryFn: () => getConfigFromLocal(),
-    async onSuccess(data) {
+    async onSuccess(data: any) {
       const { result }: { result: confDataType } = data;
       storeFrpConf.current = result;
       nameMap.current = new Map(result.frpc.map((obj) => [obj.name, obj]));
@@ -54,7 +60,7 @@ export default function Page() {
   // 修改
   const mutation = useMutation({
     mutationFn: (data: unknown) => handleSummit(data),
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setIsAdd(false);
       // 错误处理和刷新
       queryClient.invalidateQueries(["frpc"]);
@@ -68,7 +74,7 @@ export default function Page() {
   const autoCompleteList = useQuery({
     queryKey: ["OPT"],
     queryFn: () => readOptJSON(),
-    onSuccess(data) {
+    onSuccess(data: any) {
       autoCompleteMap.current = new Map(Object.entries(data));
     },
   });
@@ -97,6 +103,20 @@ export default function Page() {
         nameMap.current?.get(value)?.key !== editKEY.current
       )
         return Promise.reject(new Error("不允许有重复的配置名称"));
+    } catch (error: any) {
+      callback(error);
+    }
+  };
+
+  const validateNecessaryLabel = async (
+    _: any,
+    value: string,
+    callback: (error?: string | undefined) => void
+  ) => {
+    try {
+      if (!value || !value.trim()) return Promise.resolve();
+      if (patternThree.test(value))
+        return Promise.reject(new Error("不允许含有英文字母"));
     } catch (error: any) {
       callback(error);
     }
@@ -157,6 +177,7 @@ export default function Page() {
       setIsAdd(true);
       form.resetFields();
     }
+    console.log("obj", obj);
     setIsModalOpen(true);
   };
 
@@ -351,11 +372,7 @@ export default function Page() {
             label="配置名称"
             name="name"
             rules={[
-              {
-                required: true,
-                message: "Please input!",
-                whitespace: true,
-              },
+              inputRule,
               {
                 validator: validateName,
               },
@@ -379,7 +396,10 @@ export default function Page() {
             label="内网主机IP"
             name="local_ip"
             rules={[
-              { required: true, message: "Please input!", whitespace: true },
+              inputRule,
+              {
+                validator: validateNecessaryLabel,
+              },
             ]}
           >
             <Input />
@@ -388,7 +408,10 @@ export default function Page() {
             label="内网主机端口"
             name="local_port"
             rules={[
-              { required: true, message: "Please input!", whitespace: true },
+              inputRule,
+              {
+                validator: validateNecessaryLabel,
+              },
             ]}
           >
             <Input />
@@ -397,7 +420,10 @@ export default function Page() {
             label="远端端口"
             name={"remote_port"}
             rules={[
-              { required: true, message: "Please input!", whitespace: true },
+              inputRule,
+              {
+                validator: validateNecessaryLabel,
+              },
             ]}
           >
             <Input />
@@ -417,9 +443,8 @@ export default function Page() {
                       name={[name, "label"]}
                       rules={[
                         {
-                          required: true,
+                          ...inputRule,
                           message: "补充缺失内容",
-                          whitespace: true,
                         },
                         ({ getFieldValue }) => ({
                           async validator(_, value, callback) {
@@ -463,9 +488,8 @@ export default function Page() {
                       name={[name, "value"]}
                       rules={[
                         {
-                          required: true,
+                          ...inputRule,
                           message: "补充缺失内容",
-                          whitespace: true,
                         },
                       ]}
                     >
