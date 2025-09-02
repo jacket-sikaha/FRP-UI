@@ -1,55 +1,32 @@
 {
+  "name": "frp-ui",
   "private": true,
   "scripts": {
-    "build": "next build --debug",
-    "dev": "next dev",
-    "dev2": "next dev --turbo",
-    "lint": "next lint",
-    "lint-staged": "lint-staged",
-    "prettier": "prettier --write --ignore-unknown .",
-    "prettier:check": "prettier --check --ignore-unknown .",
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
     "start": "next start",
-    "test": "yarn prettier:check && yarn lint"
-  },
-  "git": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*": "prettier --write --ignore-unknown"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@heroicons/react": "1.0.6",
-    "antd": "5.5.2",
-    "axios": "1.4.0",
-    "clsx": "1.2.1",
+    "@ant-design/icons": "6.0.0",
+    "antd": "^5.27.1",
+    "axios": "^1.11.0",
+    "clsx": "^1.2.1",
     "date-fns": "2.29.3",
-    "dinero.js": "2.0.0-alpha.8",
-    "mongodb": "5.6.0",
-    "ms": "3.0.0-canary.1",
-    "next": "latest",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-query": "3.39.3",
-    "server-only": "0.0.1",
-    "styled-components": "6.0.0-beta.2",
-    "use-count-up": "3.0.1"
+    "next": "^15.5.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-query": "3.39.3"
   },
   "devDependencies": {
-    "@tailwindcss/forms": "0.5.3",
-    "@tailwindcss/typography": "0.5.9",
-    "@types/ms": "0.7.31",
-    "@types/node": "18.11.17",
-    "@types/react": "18.0.26",
-    "@types/react-dom": "18.0.9",
-    "@vercel/git-hooks": "1.0.0",
-    "autoprefixer": "10.4.13",
-    "eslint": "8.30.0",
-    "eslint-config-next": "latest",
-    "lint-staged": "13.1.0",
-    "postcss": "8.4.20",
-    "prettier": "2.8.1",
-    "prettier-plugin-tailwindcss": "0.2.1",
-    "tailwindcss": "3.3.1",
-    "typescript": "4.9.4"
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

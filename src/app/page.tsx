@@ -4,8 +4,8 @@ import React from "react";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
-import { getStatusFromOrigin } from "#/lib/server-action";
 import { useQueryClient, useQuery } from "react-query";
+import { getStatusFromOrigin } from "@/lib/server-action";
 
 export default function Home() {
   // 查询
