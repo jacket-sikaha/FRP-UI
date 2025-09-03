@@ -13,8 +13,8 @@ import {
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { handleSummit } from "#/lib/server-action";
-import { validateSpecialCharsOrRepeated } from "#/lib/pauseData";
+import { handleSummit } from "@/lib/server-action";
+import { validateSpecialCharsOrRepeated } from "@/lib/pauseData";
 import { useRouter } from "next/navigation";
 
 type FrpsTableProps = {

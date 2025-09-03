@@ -9,6 +9,7 @@ import {
 import { Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -33,60 +34,68 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Layout style={{ height: "98vh" }}>
-          <Sider breakpoint="lg" collapsedWidth="0">
-            <h1
-              style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}
-            >
-              FRP配置客户端
-            </h1>
+        <AntdRegistry>
+          <Layout style={{ height: "98vh" }}>
+            <Sider breakpoint="lg" collapsedWidth="0">
+              <h1
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                FRP配置客户端
+              </h1>
 
-            <Menu
-              theme="dark"
-              mode="inline"
-              defaultSelectedKeys={["1"]}
-              items={[
-                {
-                  key: "1",
-                  label: <Link href={"/"}>配置状态</Link>,
-                },
-                {
-                  key: "2",
-                  icon: <UserOutlined rev={undefined} />,
-                  label: <Link href={"/frps"}>FRP服务器配置</Link>,
-                },
-                {
-                  key: "3",
-                  icon: <VideoCameraOutlined rev={undefined} />,
-                  label: "FRP客户端配置",
-                  children: [
-                    {
-                      key: "4",
-                      label: <Link href={"/frpc"}>配置</Link>,
-                    },
-                    {
-                      key: "5",
-                      label: <Link href={"/drop-option"}>自定义选项管理</Link>,
-                    },
-                    {
-                      key: "6",
-                      // icon: <UploadOutlined rev={undefined} />,
-                      label: <Link href={"/frpconf"}>文件编辑</Link>,
-                    },
-                  ],
-                },
-              ]}
-            />
-          </Sider>
-          <Layout>
-            <Header style={{ padding: 0, background: colorBgContainer }} />
+              <Menu
+                theme="dark"
+                mode="inline"
+                defaultSelectedKeys={["1"]}
+                items={[
+                  {
+                    key: "1",
+                    label: <Link href={"/"}>配置状态</Link>,
+                  },
+                  {
+                    key: "2",
+                    icon: <UserOutlined rev={undefined} />,
+                    label: <Link href={"/frps"}>FRP服务器配置</Link>,
+                  },
+                  {
+                    key: "3",
+                    icon: <VideoCameraOutlined rev={undefined} />,
+                    label: "FRP客户端配置",
+                    children: [
+                      {
+                        key: "4",
+                        label: <Link href={"/frpc"}>配置</Link>,
+                      },
+                      {
+                        key: "5",
+                        label: (
+                          <Link href={"/drop-option"}>自定义选项管理</Link>
+                        ),
+                      },
+                      {
+                        key: "6",
+                        // icon: <UploadOutlined rev={undefined} />,
+                        label: <Link href={"/frpconf"}>文件编辑</Link>,
+                      },
+                    ],
+                  },
+                ]}
+              />
+            </Sider>
+            <Layout>
+              <Header style={{ padding: 0, background: colorBgContainer }} />
 
-            {/* // 提供 client 至 App */}
-            <QueryClientProvider client={queryClient}>
-              <Content style={{ margin: "24px 16px 0" }}>{children}</Content>
-            </QueryClientProvider>
+              {/* // 提供 client 至 App */}
+              <QueryClientProvider client={queryClient}>
+                <Content>{children}</Content>
+              </QueryClientProvider>
+            </Layout>
           </Layout>
-        </Layout>
+        </AntdRegistry>
       </body>
     </html>
   );

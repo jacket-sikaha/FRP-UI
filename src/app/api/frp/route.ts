@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { pauseToJSON } from "#/lib/pauseData";
-import { getConfigFromOrigin } from "#/lib/server-action";
+import { pauseToJSON } from "@/lib/pauseData";
+import { getConfigFromOrigin } from "@/lib/server-action";
 
 export async function GET(request: Request) {
   let res = "";

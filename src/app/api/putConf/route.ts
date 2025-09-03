@@ -1,9 +1,8 @@
-import { updateFile } from "#/lib/getBaseUrl";
-import { JsonToFrps } from "#/lib/pauseData";
-import { putConfigToOrigin, reloadConfig } from "#/lib/server-action";
+import { updateFile } from "@/lib/getBaseUrl";
+import { JsonToFrps } from "@/lib/pauseData";
+import { putConfigToOrigin, reloadConfig } from "@/lib/server-action";
 import { NextRequest, NextResponse } from "next/server";
 import path from "node:path";
-
 
 export async function PUT(request: NextRequest, context: any) {
   try {

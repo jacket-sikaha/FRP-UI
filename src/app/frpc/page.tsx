@@ -22,13 +22,13 @@ import {
   patternThree,
   patternTwo,
   validateSpecialCharsOrRepeated,
-} from "#/lib/pauseData";
+} from "@/lib/pauseData";
 import {
   getConfigFromLocal,
   handleSummit,
   readOptJSON,
   updateOptJSON,
-} from "#/lib/server-action";
+} from "@/lib/server-action";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState<FrpcDataType[]>([]);

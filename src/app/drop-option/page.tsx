@@ -1,10 +1,10 @@
 "use client";
-import { MapToObj, frpPauseToNewOptionMap } from "#/lib/pauseData";
+import { MapToObj, frpPauseToNewOptionMap } from "@/lib/pauseData";
 import {
   getConfigFromOrigin,
   readOptJSON,
   updateOptJSON,
-} from "#/lib/server-action";
+} from "@/lib/server-action";
 import { DeleteOutlined } from "@ant-design/icons";
 import {
   Button,

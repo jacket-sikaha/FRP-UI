@@ -1,6 +1,6 @@
 import React from "react";
 import { FrpsTable } from "./frps-table";
-import { getConfigFromLocal, handleSummit } from "#/lib/server-action";
+import { getConfigFromLocal, handleSummit } from "@/lib/server-action";
 async function getFrpsAndFrpc() {
   // const res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
   // next: { revalidate: 0, tags: ["collection"] },

@@ -1,13 +1,13 @@
 "use client";
 
-import { MapToObj, frpPauseToNewOptionMap } from "#/lib/pauseData";
+import { MapToObj, frpPauseToNewOptionMap } from "@/lib/pauseData";
 import {
   getConfigFromOrigin,
   putConfigToOrigin,
   readOptJSON,
   reloadConfig,
   updateOptJSON,
-} from "#/lib/server-action";
+} from "@/lib/server-action";
 import {
   Button,
   Form,
