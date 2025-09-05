@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { pauseToJSON } from "@/lib/pauseData";
 import { getConfigFromOrigin } from "@/lib/server-action";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   let res = "";
   try {
     // res = fs.readFileSync(path.join(process.cwd(), "lib", "test.txt"), "utf8");

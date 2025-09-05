@@ -1,3 +1,5 @@
+@layer theme, base, antd, components, utilities;
+
 @import "tailwindcss";
 
 :root {

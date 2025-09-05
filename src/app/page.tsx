@@ -1,70 +1,37 @@
-"use client";
+import { auth } from "@/auth";
 
-import React from "react";
-import { Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
+export default async function Index() {
+  const session = await auth();
 
-import { useQueryClient, useQuery } from "react-query";
-import { getStatusFromOrigin } from "@/lib/server-action";
-
-export default function Home() {
-  // 查询
-  const { data, isFetching } = useQuery({
-    queryKey: ["frp-status"],
-    queryFn: () => getStatusFromOrigin(),
-  });
-
-  const defaultColumns: ColumnsType<StatusTableDataType> = [
-    {
-      title: "配置名称",
-      dataIndex: "name",
-      // 都按照字符串的 Unicode 编码顺序 进行比较
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: "协议类型",
-      dataIndex: "type",
-      sorter: (a, b) => a.type.localeCompare(b.type),
-    },
-    {
-      title: "本地地址",
-      dataIndex: "local_addr",
-      sorter: (a, b) => a.local_addr.localeCompare(b.local_addr),
-    },
-    // {
-    //   title: "plugin",
-    //   dataIndex: "plugin",
-    //   sorter: (a, b) => a.plugin.localeCompare(b.plugin),
-    // },
-    {
-      title: "远程地址",
-      dataIndex: "remote_addr",
-      sorter: (a, b) => a.remote_addr.localeCompare(b.remote_addr),
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
-      sorter: (a, b) => a.status.localeCompare(b.status),
-    },
-    {
-      title: "信息",
-      dataIndex: "err",
-    },
-  ];
   return (
-    <>
-      <Table
-        bordered
-        loading={isFetching}
-        scroll={{ y: 650 }}
-        dataSource={Object.values(data || [])
-          .flatMap((obj) => obj)
-          .map((obj, index) => {
-            obj.key = index;
-            return obj;
-          })}
-        columns={defaultColumns}
-      />
-    </>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-3xl font-bold">NextAuth.js Example</h1>
+      <div>
+        This is an example site to demonstrate how to use
+        <a href="https://nextjs.authjs.dev">NextAuth.js</a> for authentication.
+        Check out the
+        <a href="/server-example" className="underline">
+          Server
+        </a>
+        and the
+        <a href="/client-example" className="underline">
+          Client
+        </a>
+        examples to see how to secure pages and get session data.
+      </div>
+      <div>
+        WebAuthn users are reset on every deploy, don't expect your test user(s)
+        to still be available after a few days. It is designed to only
+        demonstrate registration, login, and logout briefly.
+      </div>
+      <div className="flex flex-col rounded-md bg-red-100 text-black">
+        <div className="rounded-t-md bg-yellow-200 p-4 font-bold">
+          Current Session
+        </div>
+        <pre className="whitespace-pre-wrap break-all px-4 py-6">
+          {JSON.stringify(session, null, 2)}
+        </pre>
+      </div>
+    </div>
   );
 }
