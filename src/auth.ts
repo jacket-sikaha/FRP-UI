@@ -1,32 +1,30 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import { createBasicAuthHeader } from "./lib";
+import { randomUUID } from "node:crypto";
+
+class InvalidLoginError extends CredentialsSignin {
+  code = "Invalid identifier or password";
+}
 
 const providers: Provider[] = [
   Credentials({
+    id: "custom-credentials",
     credentials: {
-      email: {
-        type: "email",
-        label: "Email",
-        placeholder: "johndoe@gmail.com",
-      },
-      password: {
-        type: "password",
-        label: "Password",
-        placeholder: "*****",
-      },
+      username: { label: "Username" },
+      password: { label: "Password", type: "password" },
     },
     authorize: async (credentials) => {
       console.log("credentials:", credentials);
-      const { email, password } = credentials;
-      if (!email || !password) {
+      const { username, password } = credentials;
+      if (!username || !password) {
         throw new Error("Invalid credentials.");
       }
       try {
         // 1. 创建 Basic Auth 头部
-        const basicAuthHeader = createBasicAuthHeader(email, password);
+        const basicAuthHeader = createBasicAuthHeader(username, password);
 
         // 2. 调用需要 Basic Auth 的外部 API 进行验证
         const apiResponse = await fetch(process.env.ORIGIN_SERVER as string, {
@@ -36,12 +34,15 @@ const providers: Provider[] = [
         });
         // 3. 处理 API 响应
         if (!apiResponse.ok) {
-          // API 验证失败
-          throw new Error("Invalid email or password");
+          throw new InvalidLoginError();
         }
 
         // 5. 返回用户对象（会被用于创建会话）
-        return { email: email as string, id: email as string, basicAuthHeader };
+        return {
+          username: username as string,
+          id: randomUUID(),
+          basicAuthHeader,
+        };
       } catch (error) {
         // 可以根据错误类型返回更具体的信息
         throw new Error(

@@ -20,8 +20,8 @@ export function SignIn() {
       }}
     >
       <label>
-        Email
-        <input name="email" />
+        username
+        <input name="username" />
       </label>
       <label>
         Password
