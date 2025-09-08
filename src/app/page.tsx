@@ -1,7 +1,9 @@
-import { auth } from "@/auth";
+"use client";
+import { auth, signOut } from "@/auth";
+import { useSession, SessionProvider } from "next-auth/react";
 
-export default async function Index() {
-  const session = await auth();
+export default function Index() {
+  const session = useSession();
 
   return (
     <div className="flex flex-col gap-6">
@@ -25,7 +27,12 @@ export default async function Index() {
         demonstrate registration, login, and logout briefly.
       </div>
       <div className="flex flex-col rounded-md bg-red-100 text-black">
-        <div className="rounded-t-md bg-yellow-200 p-4 font-bold">
+        <div
+          className="rounded-t-md bg-yellow-200 p-4 font-bold"
+          onClick={() => {
+            signOut({ redirect: false }); // 确保正确触发登出
+          }}
+        >
           Current Session
         </div>
         <pre className="whitespace-pre-wrap break-all px-4 py-6">

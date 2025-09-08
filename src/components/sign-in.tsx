@@ -10,11 +10,11 @@ export function SignIn() {
         "use server";
         try {
           const res = await signIn("credentials", formData);
-          alert(res);
+          console.log("res:", res);
         } catch (error) {
-          if (error instanceof AuthError) {
-            return redirect(`/error?error=${error.type}`);
-          }
+          // if (error instanceof AuthError) {
+          //   return redirect(`/error?error=${error.type}`);
+          // }
           throw error;
         }
       }}
