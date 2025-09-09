@@ -2,11 +2,12 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import { createBasicAuthHeader } from "./lib";
+import dayjs from "dayjs";
 
 class InvalidLoginError extends CredentialsSignin {
   code = "Invalid identifier or password";
 }
-
+const maxAge = 120;
 const providers: Provider[] = [
   Credentials({
     id: "custom-credentials",
@@ -57,10 +58,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
     // 2. 配置 JWT 有效期（与第三方服务对齐，如 24 小时）
-    maxAge: 60, // 单位：秒
+    maxAge: 120, // 单位：秒
   },
   jwt: {
-    maxAge: 60, // 单位：秒
+    maxAge: 120, // 单位：秒
   },
 
   // 3. 配置加密密钥（生产环境必须通过环境变量设置）
@@ -72,72 +73,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/error",
   },
   callbacks: {
-    // authorized({ auth, request: { nextUrl } }) {
-    //   console.log("nextUrl:", nextUrl.pathname);
-    //   console.log("auth:", auth);
-    //   const isLoggedIn = !!auth?.user;
-    //   const isOnDashboard = nextUrl.pathname.startsWith("/");
-
-    //   if (isOnDashboard) {
-    //     if (isLoggedIn) return true;
-    //     return false;
-    //   } else if (isLoggedIn) {
-    //     return Response.redirect(new URL("/", nextUrl));
-    //   }
-    //   return true;
-    // },
-    /**
-     * JWT 生成/更新时的回调
-     * 作用：将用户信息存入 JWT，或在 JWT 过期前更新
-     */
-    // async jwt({ token, user }) {
-    //   console.log("token:", token);
-    //   console.log("user:", user);
-    //   // 首次登录时，user 存在，将 basicAuthHeader 存入 token
-    //   if (user) {
-    //     token.basicAuthHeader = user?.basicAuthHeader;
-    //   }
-
-    //   return token;
-    // },
-
-    /**
-     * 会话生成时的回调
-     * 作用：控制客户端能获取的会话数据
-     */
-    // async session({ session, token }) {
-    //   console.log("111111111 token:", token);
-    //   console.log("11111111 session:", session);
-    //   // 将 JWT 中的 basicAuthHeader 同步到会话
-    //   if (session.user && token.basicAuthHeader) {
-    //     session.user.basicAuthHeader = token.basicAuthHeader;
-    //   }
-    //   return session;
-    // },
-
     async jwt({ token, user }) {
-      // 将用户信息添加到 token
+      console.log("{ token, user }:", { user });
       if (user) {
-        token.id = user.id;
-        token.username = user.username;
-        // 设置 token 过期时间为 60 秒后
-        token.expires = Date.now() + 60 * 1000;
+        // 首次登录设置过期时间
+        const { basicAuthHeader, ...safeUser } = user;
+        token.expires = Date.now() + maxAge * 1000;
+        token.user = { ...safeUser };
+        token.basicAuthHeader = basicAuthHeader;
       }
-
-      // 如果 token 已过期，返回空对象
-      if (token.expires && Date.now() > token.expires) {
+      // 只有当token已过期时才返回空对象
+      if (token.expires && Date.now() > (token.expires as number)) {
         return {};
+      } else if (token.expires) {
+        // 每次请求时刷新过期时间（滑动过期）
+        token.expires = Date.now() + maxAge * 1000;
       }
-
       return token;
     },
     async session({ session, token }) {
+      console.log("session--------------------------:");
       // 将用户信息添加到 session
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.username = token.username as string;
+        session.user = token.user as typeof session.user;
         // 添加过期时间到 session
-        session.expires = token.expires as number;
+        session.expires = dayjs(
+          token.expires as number
+        ).toDate() as typeof session.expires;
+        session.ddd = dayjs(token.expires as number).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+        // session.token = token;
       }
       return session;
     },

@@ -30,7 +30,7 @@ export default function Index() {
         <div
           className="rounded-t-md bg-yellow-200 p-4 font-bold"
           onClick={() => {
-            signOut({ redirect: false }); // 确保正确触发登出
+            signOut(); // 确保正确触发登出
           }}
         >
           Current Session

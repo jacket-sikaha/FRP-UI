@@ -29,6 +29,9 @@ importers:
       date-fns:
         specifier: 2.29.3
         version: 2.29.3
+      dayjs:
+        specifier: 1.11.18
+        version: 1.11.18
       next:
         specifier: ^15.5.2
         version: 15.5.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)

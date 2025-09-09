@@ -10,7 +10,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   console.log("status:", status);
   console.log("session:", session);
 
@@ -25,7 +25,7 @@ export default function SignIn() {
         password,
         redirect: false,
       });
-
+      console.log("result:", result);
       if (result?.error) {
         setError("用户名或密码错误");
       } else {
