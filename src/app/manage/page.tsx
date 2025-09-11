@@ -31,11 +31,6 @@ export default function Home() {
       dataIndex: "local_addr",
       sorter: (a, b) => a.local_addr.localeCompare(b.local_addr),
     },
-    // {
-    //   title: "plugin",
-    //   dataIndex: "plugin",
-    //   sorter: (a, b) => a.plugin.localeCompare(b.plugin),
-    // },
     {
       title: "远程地址",
       dataIndex: "remote_addr",
