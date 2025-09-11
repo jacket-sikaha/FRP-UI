@@ -1,8 +1,11 @@
 "use server";
+
+import { signOut } from "@/auth";
+
 // 对于提交请求这种自定义的请求函数需要在client组件里使用，需要使用server action这种配置写法
 
 export const handleSummit = async (data: unknown) => {
-  let res = await fetch(`${process.env.LOCAL_SERVER}/api/putConf`, {
+  const res = await fetch(`/api/putConf`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -11,16 +14,18 @@ export const handleSummit = async (data: unknown) => {
 };
 
 export const getStatusFromOrigin = async (): Promise<StatusDataType> => {
-  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/status`, {
+  const res = await fetch(`${process.env.ORIGIN_SERVER}/api/status`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     cache: "no-store",
   });
   return await res.json();
 };
 
 export const getConfigFromLocal = async () => {
-  let res = await fetch(`${process.env.LOCAL_SERVER}/api/frp`, {
+  const res = await fetch(`/api/frp`, {
     method: "GET",
     cache: "no-store",
   });
@@ -28,37 +33,42 @@ export const getConfigFromLocal = async () => {
 };
 
 export const getConfigFromOrigin = async (): Promise<string> => {
-  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
+  const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "GET",
+    headers: {},
     cache: "no-store",
   });
   return await res.text();
 };
 
 export const putConfigToOrigin = async (data: string) => {
-  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
+  const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "PUT",
-    headers: { "Content-Type": "application/xml" },
+    headers: {
+      "Content-Type": "application/xml",
+    },
     body: data,
   });
   return await res.text();
 };
 
 export const reloadConfig = async () => {
-  let res = await fetch(`${process.env.ORIGIN_SERVER}/api/reload`);
+  const res = await fetch(`${process.env.ORIGIN_SERVER}/api/reload`, {
+    headers: {},
+  });
   return await res.text();
 };
 
 // JSON
 export const readOptJSON = async (): Promise<Map<string, string[]>> => {
-  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`, {
+  const res = await fetch(`/api/optAction`, {
     cache: "no-store",
   });
   return await res.json();
 };
 
 export const updateOptJSON = async (data: unknown) => {
-  let res = await fetch(`${process.env.LOCAL_SERVER}/api/optAction`, {
+  const res = await fetch(`/api/optAction`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -66,3 +76,5 @@ export const updateOptJSON = async (data: unknown) => {
   });
   return await res.json();
 };
+
+export const signOutAction = async () => signOut();

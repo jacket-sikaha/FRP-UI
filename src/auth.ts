@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 class InvalidLoginError extends CredentialsSignin {
   code = "Invalid identifier or password";
 }
-const maxAge = 120;
+const maxAge = 2400 * 3;
 const providers: Provider[] = [
   Credentials({
     id: "custom-credentials",
@@ -58,10 +58,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
     // 2. 配置 JWT 有效期（与第三方服务对齐，如 24 小时）
-    maxAge: 120, // 单位：秒
+    maxAge: maxAge, // 单位：秒
   },
   jwt: {
-    maxAge: 120, // 单位：秒
+    maxAge: maxAge, // 单位：秒
   },
 
   // 3. 配置加密密钥（生产环境必须通过环境变量设置）
@@ -88,6 +88,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } else if (token.expires) {
         // 每次请求时刷新过期时间（滑动过期）
         token.expires = Date.now() + maxAge * 1000;
+        token.ddd = dayjs(token.expires as number).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
       }
       return token;
     },
@@ -97,13 +100,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token && session.user) {
         session.user = token.user as typeof session.user;
         // 添加过期时间到 session
-        session.expires = dayjs(
-          token.expires as number
-        ).toDate() as typeof session.expires;
-        session.ddd = dayjs(token.expires as number).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-        // session.token = token;
+        // session.expires = dayjs(
+        //   token.expires as number
+        // ).toDate() as typeof session.expires;
+        session.ddd = dayjs(session.expires).format("YYYY-MM-DD HH:mm:ss");
+        session.token = token;
       }
       return session;
     },
