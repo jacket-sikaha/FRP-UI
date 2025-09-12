@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Inter } from "next/font/google";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@ant-design/v5-patch-for-react-19";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <main className="h-svh w-screen">{children}</main>
+          <AntdRegistry>
+            <main className="h-svh w-full">{children}</main>
+          </AntdRegistry>
         </SessionProvider>
       </body>
     </html>

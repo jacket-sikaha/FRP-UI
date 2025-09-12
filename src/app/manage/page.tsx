@@ -1,17 +1,15 @@
 "use client";
 
-import React from "react";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
-import { useQueryClient, useQuery } from "react-query";
-import { getStatusFromOrigin } from "@/lib/server-action";
+import { useQuery } from "react-query";
 
 export default function Home() {
   // 查询
   const { data, isFetching } = useQuery({
     queryKey: ["frp-status"],
-    queryFn: () => getStatusFromOrigin(),
+    queryFn: () => fetch(`/frp-api/status`).then((res) => res.json()),
   });
 
   const defaultColumns: ColumnsType<StatusTableDataType> = [
@@ -47,11 +45,11 @@ export default function Home() {
     },
   ];
   return (
-    <>
+    <div className="w-full">
       <Table
         bordered
         loading={isFetching}
-        scroll={{ y: 650 }}
+        // scroll={{ y: 650 }}
         dataSource={Object.values(data || [])
           .flatMap((obj) => obj)
           .map((obj, index) => {
@@ -60,6 +58,6 @@ export default function Home() {
           })}
         columns={defaultColumns}
       />
-    </>
+    </div>
   );
 }
