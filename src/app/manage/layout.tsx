@@ -31,10 +31,10 @@ export default function RootLayout({
   } = theme.useToken();
 
   return (
-    <div className="flex h-svh w-screen">
+    <div className="flex h-svh w-full">
       <ServerSlider />
 
-      <div className="flex-1">
+      <div className="flex-1 p-3 bg-slate-100">
         {/* // 提供 client 至 App */}
         <QueryClientProvider client={queryClient}>
           <Content>{children}</Content>
