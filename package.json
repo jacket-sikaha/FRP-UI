@@ -20,7 +20,8 @@
     "next-auth": "^5.0.0-beta.29",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-query": "3.39.3"
+    "react-query": "3.39.3",
+    "smol-toml": "1.4.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

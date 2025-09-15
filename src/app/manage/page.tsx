@@ -45,17 +45,12 @@ export default function Home() {
     },
   ];
   return (
-    <div className="w-full">
+    <div className="h-full">
       <Table
         bordered
         loading={isFetching}
         // scroll={{ y: 650 }}
-        dataSource={Object.values(data || [])
-          .flatMap((obj) => obj)
-          .map((obj, index) => {
-            obj.key = index;
-            return obj;
-          })}
+        dataSource={data || []}
         columns={defaultColumns}
       />
     </div>
