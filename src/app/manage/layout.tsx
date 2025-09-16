@@ -31,7 +31,7 @@ export default function RootLayout({
   } = theme.useToken();
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full h-full">
       <ServerSlider />
 
       <div className="flex-1 p-3 bg-slate-100">

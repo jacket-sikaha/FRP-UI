@@ -22,7 +22,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           <UserHeader />
           <SessionProvider>
             <AntdRegistry>
-              <main className="flex-1 overflow-auto">{children}</main>
+              <main className="flex-1 h-full overflow-auto">{children}</main>
             </AntdRegistry>
           </SessionProvider>
         </div>

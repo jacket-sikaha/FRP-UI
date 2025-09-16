@@ -32,7 +32,6 @@ const providers: Provider[] = [
           },
         });
         // 3. 处理 API 响应
-        console.log("apiResponse.ok:", apiResponse.ok);
         if (!apiResponse.ok) {
           throw new InvalidLoginError();
         }
@@ -68,13 +67,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
   providers,
   pages: {
-    // signIn: "/signin",
     signIn: "/auth/signin",
     error: "/error",
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log("{ token, user }:", { user });
       if (user) {
         // 首次登录设置过期时间
         const { basicAuthHeader, ...safeUser } = user;
@@ -99,12 +96,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // 将用户信息添加到 session
       if (token && session.user) {
         session.user = token.user as typeof session.user;
-        // 添加过期时间到 session
-        // session.expires = dayjs(
-        //   token.expires as number
-        // ).toDate() as typeof session.expires;
         session.ddd = dayjs(session.expires).format("YYYY-MM-DD HH:mm:ss");
-        session.token = token;
+        // session.token = token;
       }
       return session;
     },

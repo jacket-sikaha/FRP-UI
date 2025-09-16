@@ -48,7 +48,7 @@ function ServerSlider() {
                 {
                   key: "6",
                   // icon: <UploadOutlined rev={undefined} />,
-                  label: <Link href={"/frpconf"}>文件编辑</Link>,
+                  label: <Link href={"/manage/frp-conf"}>文件编辑</Link>,
                 },
               ],
             },
