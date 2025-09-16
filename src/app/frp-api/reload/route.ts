@@ -12,7 +12,7 @@ export async function GET(request: Request) {
       Authorization,
     },
   });
-  const msg = await res.json();
+  const msg = await res.text();
   return NextResponse.json({
     code: 200,
     msg: "重载成功",

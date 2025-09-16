@@ -17,17 +17,17 @@ export async function GET(request: Request) {
 }
 
 // // 更新配置文件
-// export async function PUT(request: Request) {
-//   const body = await request.json();
-//   const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
-//     method: "PUT",
-//     headers: request.headers,
-//     body: JSON.stringify(body),
-//   });
-//   const msg = await res.json();
-//   return NextResponse.json({
-//     code: 200,
-//     msg: "更新成功",
-//     data: msg,
-//   });
-// }
+export async function PUT(request: Request) {
+  const body = await request.json();
+  const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
+    method: "PUT",
+    headers: request.headers,
+    body: JSON.stringify(body),
+  });
+  const msg = await res.text();
+  return NextResponse.json({
+    code: 200,
+    msg: "更新成功",
+    data: msg,
+  });
+}

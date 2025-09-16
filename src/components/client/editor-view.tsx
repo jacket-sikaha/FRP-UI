@@ -2,12 +2,24 @@
 import { langs } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { basicSetup, EditorView } from "codemirror";
-import { useEffect, useRef } from "react";
+import { Ref, useEffect, useImperativeHandle, useRef } from "react";
 
-function CodeMirrorEditor({ value = "", height = "300" }) {
+export type EditorRefType = {
+  getValue: () => string;
+  focus: () => void;
+};
+
+function CodeMirrorEditor({
+  value = "",
+  height = "300",
+  ref,
+}: {
+  value: string;
+  height: string;
+  ref: Ref<EditorRefType>;
+}) {
   const codeMirrorInstance = useRef<EditorView>(null);
-  // 用于挂载CodeMirror的DOM元素ref
-  const editorRef = useRef(null);
+
   useEffect(() => {
     const parent = document.querySelector(".editor-view");
     if (!parent) return;
@@ -34,6 +46,14 @@ function CodeMirrorEditor({ value = "", height = "300" }) {
       }
     };
   }, [value]);
+  // 向外部暴露方法
+  useImperativeHandle(ref, () => ({
+    // 获取当前编辑器值
+    getValue: () => codeMirrorInstance.current?.state.doc.toString() || "",
+    // 聚焦编辑器
+    focus: () => codeMirrorInstance.current?.focus(),
+  }));
+
   return <div className="editor-view size-full"></div>;
 }
 

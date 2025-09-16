@@ -1,4 +1,4 @@
-import CodeMirrorEditor from "@/components/client/editor-view";
+import FrpEditor from "@/components/client/frp-editor";
 import { headers } from "next/headers";
 
 export default async function FrpConfPage() {
@@ -15,11 +15,53 @@ export default async function FrpConfPage() {
     // 注意：服务端 fetch 默认不携带 cookie，必须显式设置
   });
   const conf = await res.json();
+  // reloadConf
+  const reloadConf = async () => {
+    "use server";
+    try {
+      const res = await fetch(`http://${host}/frp-api/reload`, {
+        headers: {
+          Cookie: cookieHeader,
+        },
+      });
+      const data = await res.json();
+      console.log("data", data, res.ok);
+      return res.ok;
+    } catch (error) {
+      return false;
+    }
+  };
+  const updateConf = async (val?: string) => {
+    "use server";
+    if (!val) {
+      return false;
+    }
+    try {
+      const res = await fetch(`http://${host}/frp-api/config`, {
+        method: "PUT",
+        headers: {
+          Cookie: cookieHeader,
+        },
+        body: JSON.stringify(val),
+      });
+      const data = await res.json();
+
+      console.log("data", data, res.ok);
+      return res.ok;
+    } catch (error) {
+      return false;
+    }
+  };
 
   return (
     <div className="flex flex-col items-center h-full">
       <div className="md:w-2xl max-w-4xl w-sm">
-        <CodeMirrorEditor value={conf} height="500" />
+        <FrpEditor
+          value={conf}
+          height="500"
+          updateConf={updateConf}
+          reloadConf={reloadConf}
+        />
       </div>
     </div>
   );
