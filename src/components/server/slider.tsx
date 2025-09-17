@@ -30,7 +30,7 @@ function ServerSlider() {
             {
               key: "2",
               icon: <UserOutlined rev={undefined} />,
-              label: <Link href={"/frps"}>FRP服务器配置</Link>,
+              label: <Link href={"/manage/frps"}>FRP服务器配置</Link>,
             },
             {
               key: "3",
@@ -39,7 +39,7 @@ function ServerSlider() {
               children: [
                 {
                   key: "4",
-                  label: <Link href={"/frpc"}>配置</Link>,
+                  label: <Link href={"/manage/frpc"}>配置</Link>,
                 },
                 {
                   key: "5",

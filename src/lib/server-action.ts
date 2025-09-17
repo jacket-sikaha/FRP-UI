@@ -1,6 +1,8 @@
 "use server";
 
 import { signOut } from "@/auth";
+import { headers } from "next/headers";
+import { parse } from "smol-toml";
 
 // 对于提交请求这种自定义的请求函数需要在client组件里使用，需要使用server action这种配置写法
 
@@ -26,7 +28,6 @@ export const getStatusFromOrigin = async (): Promise<StatusDataType> => {
 
 export const getConfigFromLocal = async () => {
   const res = await fetch(`/api/frp`, {
-    method: "GET",
     cache: "no-store",
   });
   return await res.json();
@@ -34,8 +35,6 @@ export const getConfigFromLocal = async () => {
 
 export const getConfigFromOrigin = async (): Promise<string> => {
   const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
-    method: "GET",
-    headers: {},
     cache: "no-store",
   });
   return await res.text();
@@ -78,3 +77,66 @@ export const updateOptJSON = async (data: unknown) => {
 };
 
 export const signOutAction = async () => signOut();
+
+export const reloadConf = async () => {
+  try {
+    const header = await headers();
+    const host = header.get("host") || "";
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    const fullUrl = `${protocol}://${host}/frp-api/reload`;
+    const cookieHeader = header.get("cookie") || "";
+    const res = await fetch(fullUrl, {
+      headers: {
+        cookie: cookieHeader,
+      },
+    });
+    const data = await res.json();
+    console.log("data", data, res.ok);
+    return res.ok;
+  } catch (error) {
+    return false;
+  }
+};
+export const getConf = async () => {
+  try {
+    const header = await headers();
+    const host = header.get("host") || "";
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const cookieHeader = header.get("cookie") || "";
+    const res = await fetch(fullUrl, {
+      headers: {
+        cookie: cookieHeader,
+      },
+      // next: { revalidate: false },
+    });
+    const data = await res.json();
+    return parse(data);
+  } catch (error) {
+    return false;
+  }
+};
+export const updateConf = async (val?: string) => {
+  if (!val) {
+    return false;
+  }
+  try {
+    const header = await headers();
+    const host = header.get("host") || "";
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const cookieHeader = header.get("cookie") || "";
+    const res = await fetch(fullUrl, {
+      method: "PUT",
+      headers: {
+        cookie: cookieHeader,
+      },
+      body: JSON.stringify(val),
+    });
+    const data = await res.json();
+    console.log("data", data, res.ok);
+    return res.ok;
+  } catch (error) {
+    return false;
+  }
+};
