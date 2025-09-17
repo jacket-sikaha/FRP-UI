@@ -18,11 +18,11 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="h-svh w-full flex flex-col">
+        <div className="h-svh w-full grid grid-rows-[auto_1fr]">
           <UserHeader />
           <SessionProvider>
             <AntdRegistry>
-              <main className="flex-1 h-full overflow-auto">{children}</main>
+              <main className="h-full overflow-auto">{children}</main>
             </AntdRegistry>
           </SessionProvider>
         </div>
