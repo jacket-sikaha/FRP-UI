@@ -6,7 +6,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
+import { App, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ServerSlider from "@/components/server/slider";
@@ -36,9 +36,11 @@ export default function RootLayout({
 
       <div className="flex-1 p-3 bg-slate-100">
         {/* // 提供 client 至 App */}
-        <QueryClientProvider client={queryClient}>
-          <Content>{children}</Content>
-        </QueryClientProvider>
+        <App>
+          <QueryClientProvider client={queryClient}>
+            <Content>{children}</Content>
+          </QueryClientProvider>
+        </App>
       </div>
     </div>
   );

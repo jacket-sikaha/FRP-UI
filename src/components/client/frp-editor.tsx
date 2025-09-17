@@ -6,13 +6,15 @@ import { Button, message } from "antd";
 function FrpEditor({
   value = "",
   height = "300",
-  updateConf = async (val?: string) => true,
-  reloadConf = async () => true,
+  updateConf = async (val?: string) => false,
+  reloadConf = async () => false,
 }) {
   const editorRef = useRef<EditorRefType>(null);
+  const [messageApi, contextHolder] = message.useMessage();
 
   return (
     <div>
+      {contextHolder}
       <div className="flex items-center gap-5 p-3">
         <Button
           onClick={async () => {
@@ -20,9 +22,9 @@ function FrpEditor({
             console.log(conf);
             const res = await updateConf(conf);
             if (res) {
-              message.success("配置更新成功");
+              messageApi.success("配置更新成功");
             } else {
-              message.error("配置更新失败");
+              messageApi.error("配置更新失败");
             }
           }}
         >
@@ -32,9 +34,9 @@ function FrpEditor({
           onClick={async () => {
             const res = await reloadConf();
             if (res) {
-              message.success("配置重载成功");
+              messageApi.success("配置重载成功");
             } else {
-              message.error("配置重载失败");
+              messageApi.error("配置重载失败");
             }
           }}
         >
