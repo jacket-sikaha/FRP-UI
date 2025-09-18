@@ -4,9 +4,10 @@ import { getConf } from "@/lib/server-action";
 export default async function FrpcViewPage() {
   const data = (await getConf()) || {};
   const { proxies, ...frpc } = data;
+  console.log("frpc", data);
   return (
     <div>
-      <FrpcDescriptions title="FRPC Info" bordered items={frpc} />
+      <FrpcDescriptions bordered items={frpc} />
     </div>
   );
 }

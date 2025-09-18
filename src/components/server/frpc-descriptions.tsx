@@ -1,7 +1,15 @@
 import { Descriptions } from "antd";
 import React from "react";
 
-function DescriptionsItem({ obj }: { obj: Record<string, unknown> }) {
+function DescriptionsItem({
+  title = "Info",
+  obj = {},
+  bordered = false,
+}: {
+  title?: string;
+  obj: Record<string, unknown>;
+  bordered?: boolean;
+}) {
   const itemsArray = Object.entries(obj).map(([key, value]) => ({
     label: key,
     children: (
@@ -12,32 +20,38 @@ function DescriptionsItem({ obj }: { obj: Record<string, unknown> }) {
       </div>
     ),
   }));
-  return <Descriptions bordered={false} items={itemsArray} />;
+  return <Descriptions title={title} bordered={bordered} items={itemsArray} />;
 }
 
 function FrpcDescriptions({
-  title = "Info",
   items = {},
   bordered = false,
 }: {
-  title: string;
   items: Record<string, unknown>;
   bordered?: boolean;
 }) {
-  const itemsArray = Object.entries(items).map(([key, value]) => ({
-    label: key,
-    span: 2,
-    children: (
-      <div>
-        {(typeof value === "object" ? (
-          <DescriptionsItem obj={value as Record<string, unknown>} />
-        ) : (
-          (value as string)
-        )) ?? "-"}
-      </div>
-    ),
-  }));
-  return <Descriptions title={title} bordered={bordered} items={itemsArray} />;
+  const itemsArray = Object.entries(items)
+    .filter(([_, value]) => typeof value !== "object")
+    .map(([key, value]) => ({
+      label: key,
+      span: 2,
+      children: <div>{(value as string) ?? "-"}</div>,
+    }));
+  return (
+    <div className="flex flex-col gap-3">
+      <Descriptions title={"FRPC Info"} bordered items={itemsArray} />
+      {Object.entries(items)
+        .filter(([_, value]) => typeof value === "object")
+        .map(([key, value]) => (
+          <DescriptionsItem
+            key={key}
+            title={key}
+            obj={value as Record<string, unknown>}
+            bordered={bordered}
+          />
+        ))}
+    </div>
+  );
 }
 
 export default FrpcDescriptions;
