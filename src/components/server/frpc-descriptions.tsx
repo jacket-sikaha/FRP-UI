@@ -39,7 +39,9 @@ function FrpcDescriptions({
     }));
   return (
     <div className="flex flex-col gap-3">
-      <Descriptions title={"FRPC Info"} bordered items={itemsArray} />
+      {itemsArray.length > 0 && (
+        <Descriptions title={"FRPC Info"} bordered items={itemsArray} />
+      )}
       {Object.entries(items)
         .filter(([_, value]) => typeof value === "object")
         .map(([key, value]) => (
