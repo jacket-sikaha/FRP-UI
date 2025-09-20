@@ -5,6 +5,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
+    "auth": "npx auth secret",
     "lint": "eslint"
   },
   "dependencies": {

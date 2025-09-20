@@ -10,6 +10,7 @@ import {
 import { parse } from "smol-toml";
 
 async function handleSwitchChange(data: any) {
+  "use server";
   const res = await updateConf(data);
   if (res) {
     const reloadRes = await reloadConf();

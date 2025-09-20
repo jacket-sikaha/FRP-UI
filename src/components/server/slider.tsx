@@ -43,12 +43,16 @@ function ServerSlider() {
                 },
                 {
                   key: "5",
-                  label: <Link href={"/drop-option"}>自定义选项管理</Link>,
+                  label: <Link href={"/drop-option"}>修改配置</Link>,
+                },
+                {
+                  key: "15",
+                  label: <Link href={"/manage/proxies"}>修改proxies配置</Link>,
                 },
                 {
                   key: "6",
                   // icon: <UploadOutlined rev={undefined} />,
-                  label: <Link href={"/manage/frp-conf"}>文件编辑</Link>,
+                  label: <Link href={"/manage/frp-conf"}>配置文件编辑</Link>,
                 },
               ],
             },

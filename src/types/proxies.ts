@@ -8,9 +8,10 @@ export type ProxyBaseConfig = {
     groupKey?: string; // 负载均衡分组密钥，用于对负载均衡分组进行鉴权，groupKey 相同的代理才会被加入到同一个分组中。
   };
   healthCheck?: HealthCheckConfig;
-  [key: string]: unknown;
+  [key: string]: any;
 } & ProxyBackend;
 
+// 代理网络层配置
 export type ProxyTransport = {
   useEncryption?: boolean; // 是否启用加密功能，启用后该代理和服务端之间的通信内容都会被加密传输，如果 frpc 启用了全局 TLS，则不需要再启用此参数。	No
   useCompression?: boolean; // 是否启用压缩功能，启用后该代理和服务端之间的通信内容都会被压缩传输。	No
@@ -23,11 +24,13 @@ export type ProxyBackend = {
   localIP?: string; // 被代理的本地服务 IP，默认为 127.0.0.1。	No
   localPort?: number; // 被代理的本地服务端口。	No
   plugin?: {
+    // 客户端插件配置
     type: string;
     [key: string]: string;
   };
 };
 
+// 健康检查配置
 export type HealthCheckConfig = {
   type: string; // 健康检查类型，可选值为 tcp, http, tls。	Yes
   timeoutSeconds?: number; // 健康检查超时时间(秒)，默认为 3s。	No

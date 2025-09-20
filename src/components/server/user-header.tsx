@@ -9,13 +9,10 @@ async function UserHeader() {
 
   return (
     <header className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
+      <div className="px-10">
         <div className="flex justify-between items-center h-12">
-          <div className="flex items-center">
+          <div className="flex items-center w-10">
             <a href="#" className="flex items-center">
-              <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white mr-2">
-                <i className="fa fa-bolt"></i>
-              </div>
               <span className="font-bold text-gray-800">Brand</span>
             </a>
           </div>

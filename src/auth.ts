@@ -64,7 +64,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   // 3. 配置加密密钥（生产环境必须通过环境变量设置）
-  secret: process.env.AUTH_SECRET,
+  // secret: process.env.AUTH_SECRET,
   providers,
   pages: {
     signIn: "/auth/signin",

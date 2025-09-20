@@ -4,3 +4,11 @@ export const createBasicAuthHeader = (username: string, password: string) => {
   const base64Credentials = Buffer.from(credentials).toString("base64");
   return `Basic ${base64Credentials}`;
 };
+
+export const obj2Arr = (obj: Record<string, unknown>) => {
+  return Object.entries(obj).map(([key, value]) => ({ key, value }));
+};
+
+export const arr2Obj = (arr: { key: string; value: unknown }[]) => {
+  return Object.fromEntries(arr.map((item) => [item.key, item.value]));
+};
