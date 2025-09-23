@@ -1,7 +1,7 @@
-import DynamicTable from "@/components/client/dynamic-table";
+import FrpcConfDrawer from "@/components/client/frpc-conf-drawer";
 import FrpcDescriptions from "@/components/server/frpc-descriptions";
 import { getConf } from "@/lib/server-action";
-import { Button } from "antd";
+import { ClientCommonConfig } from "@/types/frpc";
 
 export default async function FrpcViewPage() {
   const data = (await getConf()) || {};
@@ -10,7 +10,7 @@ export default async function FrpcViewPage() {
   return (
     <div className="p-3 space-y-5">
       <FrpcDescriptions bordered items={frpc} />
-      <Button type="primary">修改基础配置</Button>
+      <FrpcConfDrawer value={{ ...frpc } as ClientCommonConfig} />
     </div>
   );
 }

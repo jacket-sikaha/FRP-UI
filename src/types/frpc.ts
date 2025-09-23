@@ -1,5 +1,5 @@
 import { ProxyBaseConfig } from "./proxies";
-import { TLSConfig } from "./webServer";
+import { TLSConfig, WebServerConfig } from "./webServer";
 
 export interface FrpcConfig extends ClientCommonConfig {
   proxies: ProxyBaseConfig[];
@@ -16,6 +16,8 @@ export type ClientCommonConfig = {
   loginFailExit?: boolean; // 第一次登陆失败后是否退出，默认为 true。
   udpPacketSize?: number;
   includes?: string[];
+  start?: string[]; //指定启用部分代理，当配置了较多代理，但是只希望启用其中部分时可以通过此参数指定，默认为全部启用
+  webServer?: WebServerConfig; // 服务端 Web 配置。
   log?: LogConfig; // 日志配置。
   transport?: ClientTransportConfig;
   virtualNet?: {
@@ -74,5 +76,3 @@ export type ClientTransportConfig = {
     disableCustomTLSFirstByte?: boolean; // 启用 TLS 连接时，不发送 0x17 特殊字节。默认为 true。当配置为 true 时，无法和 vhostHTTPSPort 端口复用。
   } & TLSConfig;
 };
-
-const a = {} as FrpcConfig;
