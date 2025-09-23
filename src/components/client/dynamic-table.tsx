@@ -5,8 +5,9 @@ import { proxiesZh } from "@/types/proxies-zh";
 import { Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
-import DrawerRef from "./drawer-container";
 import { useMemo, useState } from "react";
+import ProxiesForm from "./proxies-form";
+import DrawerContainer from "../server/drawer-container";
 
 function DynamicTable({ obj = [] }: { obj: Record<string, unknown>[] }) {
   const [show, setShow] = useState(false);
@@ -68,7 +69,9 @@ function DynamicTable({ obj = [] }: { obj: Record<string, unknown>[] }) {
           ),
         }}
       />
-      <DrawerRef value={val} show={show} onClose={() => setShow(false)} />
+      <DrawerContainer show={show} onClose={() => setShow(false)}>
+        <ProxiesForm value={val} />
+      </DrawerContainer>
     </div>
   );
 }

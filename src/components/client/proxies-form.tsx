@@ -15,17 +15,17 @@ const ProxiesType = [
   "sudp",
   "xtcp",
 ];
-function ProxiesForm({ val }: { val?: ProxyBaseConfig }) {
-  console.log("val:", val);
+function ProxiesForm({ value }: { value?: ProxyBaseConfig }) {
+  console.log("value:", value);
   const [form] = Form.useForm<ProxyBaseConfig>();
-  const onFinish = (val: any) => {
-    console.log("val:", val);
+  const onFinish = (value: any) => {
+    console.log("value:", value);
   };
 
   useEffect(() => {
-    if (!val) return;
+    if (!value) return;
     const data = Object.fromEntries(
-      Object.entries(val).map(([key, value]) => [
+      Object.entries(value).map(([key, value]) => [
         key,
         typeof value === "object" ? obj2Arr(value) : value,
       ])

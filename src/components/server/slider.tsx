@@ -39,7 +39,7 @@ function ServerSlider() {
               children: [
                 {
                   key: "4",
-                  label: <Link href={"/manage/frpc"}>配置</Link>,
+                  label: <Link href={"/manage/frpc"}>基础配置</Link>,
                 },
                 {
                   key: "5",
@@ -47,7 +47,7 @@ function ServerSlider() {
                 },
                 {
                   key: "15",
-                  label: <Link href={"/manage/proxies"}>修改proxies配置</Link>,
+                  label: <Link href={"/manage/proxies"}>代理配置</Link>,
                 },
                 {
                   key: "6",
