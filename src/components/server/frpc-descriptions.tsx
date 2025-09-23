@@ -1,4 +1,6 @@
-import { Descriptions } from "antd";
+import { frpcCommonConfigZh } from "@/types/frpc-common-config-zh";
+import { proxiesZh } from "@/types/proxies-zh";
+import { Descriptions, Tooltip } from "antd";
 import React from "react";
 
 function DescriptionsItem({
@@ -11,7 +13,7 @@ function DescriptionsItem({
   bordered?: boolean;
 }) {
   const itemsArray = Object.entries(obj).map(([key, value]) => ({
-    label: key,
+    label: <Tooltip title={frpcCommonConfigZh[key] || key}>{key}</Tooltip>,
     children: (
       <div>
         {(typeof value === "object"
@@ -33,7 +35,7 @@ function FrpcDescriptions({
   const itemsArray = Object.entries(items)
     .filter(([_, value]) => typeof value !== "object")
     .map(([key, value]) => ({
-      label: key,
+      label: <Tooltip title={frpcCommonConfigZh[key] || key}>{key}</Tooltip>,
       span: 2,
       children: <div>{(value as string) ?? "-"}</div>,
     }));
@@ -47,7 +49,7 @@ function FrpcDescriptions({
         .map(([key, value]) => (
           <DescriptionsItem
             key={key}
-            title={key}
+            title={frpcCommonConfigZh[key] || key}
             obj={value as Record<string, unknown>}
             bordered={bordered}
           />

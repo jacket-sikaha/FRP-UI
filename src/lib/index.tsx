@@ -5,10 +5,18 @@ export const createBasicAuthHeader = (username: string, password: string) => {
   return `Basic ${base64Credentials}`;
 };
 
-export const obj2Arr = (obj: Record<string, unknown>) => {
+export const obj2FormList = (obj: Record<string, unknown>) => {
   return Object.entries(obj).map(([key, value]) => ({ key, value }));
 };
 
-export const arr2Obj = (arr: { key: string; value: unknown }[]) => {
+export const formList2Obj = (arr: { key: string; value: unknown }[]) => {
   return Object.fromEntries(arr.map((item) => [item.key, item.value]));
+};
+
+export const arr2FormList = (arr: string[]) => {
+  return arr.map((item) => ({ value: item }));
+};
+
+export const formList2Arr = (arr: { value: string }[]) => {
+  return arr.map((item) => item.value);
 };

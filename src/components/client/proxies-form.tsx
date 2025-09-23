@@ -2,8 +2,8 @@
 import { ProxyBaseConfig } from "@/types/proxies";
 import { Button, Form, Input, Select } from "antd";
 import { useEffect } from "react";
-import ProxiesFormList from "./proxies-form-list";
-import { obj2Arr } from "@/lib";
+import ObjInputFormList from "./obj-input-form-list";
+import { obj2FormList } from "@/lib";
 
 const ProxiesType = [
   "tcp",
@@ -27,7 +27,7 @@ function ProxiesForm({ value }: { value?: ProxyBaseConfig }) {
     const data = Object.fromEntries(
       Object.entries(value).map(([key, value]) => [
         key,
-        typeof value === "object" ? obj2Arr(value) : value,
+        typeof value === "object" ? obj2FormList(value) : value,
       ])
     );
     form.setFieldsValue(data);
@@ -63,9 +63,9 @@ function ProxiesForm({ value }: { value?: ProxyBaseConfig }) {
         <Form.Item label="被代理的本地服务端口 (localPort)" name="localPort">
           <Input />
         </Form.Item>
-        <ProxiesFormList name="plugin" title="客户端插件配置 (plugin)" />
-        <ProxiesFormList name="transport" title="代理网络层配置 (transport)" />
-        <ProxiesFormList
+        <ObjInputFormList name="plugin" title="客户端插件配置 (plugin)" />
+        <ObjInputFormList name="transport" title="代理网络层配置 (transport)" />
+        <ObjInputFormList
           name="healthCheck"
           title="健康检查配置 (healthCheck)"
         />
