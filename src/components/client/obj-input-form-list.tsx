@@ -1,9 +1,8 @@
 "use client";
-import { ProxyBaseConfig } from "@/types/proxies";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select, Space } from "antd";
+import { Button, Form, Input, Space } from "antd";
 
-function ProxiesFormList({ name = "temp", title = "Proxy" }) {
+function ObjInputFormList({ name = "temp", title = "Proxy", isArray = false }) {
   return (
     <div>
       <div className="p-2">{title}</div>
@@ -16,13 +15,15 @@ function ProxiesFormList({ name = "temp", title = "Proxy" }) {
                 style={{ display: "flex", marginBottom: 8 }}
                 align="baseline"
               >
-                <Form.Item
-                  {...restField}
-                  name={[name, "key"]}
-                  rules={[{ required: true, message: "必填" }]}
-                >
-                  <Input placeholder="key" />
-                </Form.Item>
+                {!isArray && (
+                  <Form.Item
+                    {...restField}
+                    name={[name, "key"]}
+                    rules={[{ required: true, message: "必填" }]}
+                  >
+                    <Input placeholder="key" />
+                  </Form.Item>
+                )}
                 <Form.Item
                   {...restField}
                   name={[name, "value"]}
@@ -50,4 +51,4 @@ function ProxiesFormList({ name = "temp", title = "Proxy" }) {
   );
 }
 
-export default ProxiesFormList;
+export default ObjInputFormList;
