@@ -1,4 +1,5 @@
 export type ProxyBaseConfig = {
+  id?: string; // 前端渲染所需ID
   name: string; // 代理名称。	Yes
   type: string; // 代理类型，可选值为 tcp, udp, http, https, tcpmux, stcp, sudp, xtcp。	Yes
   remotePort?: number;

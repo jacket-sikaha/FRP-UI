@@ -140,3 +140,40 @@ export const updateConf = async (val?: string) => {
     return false;
   }
 };
+
+export const updateAndReloadConf = async (val?: string) => {
+  console.log("val222222222222222", val);
+  if (!val) {
+    return false;
+  }
+  try {
+    const header = await headers();
+    const host = header.get("host") || "";
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const cookieHeader = header.get("cookie") || "";
+    const res = await fetch(fullUrl, {
+      method: "PUT",
+      headers: {
+        cookie: cookieHeader,
+      },
+      body: JSON.stringify(val),
+    });
+    await res.json();
+    if (res.ok) {
+      console.log("update success");
+      const url = `${protocol}://${host}/frp-api/reload`;
+      const res = await fetch(url, {
+        headers: {
+          cookie: cookieHeader,
+        },
+      });
+      const data = await res.json();
+      console.log("data", data, res.ok);
+      return res.ok;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};

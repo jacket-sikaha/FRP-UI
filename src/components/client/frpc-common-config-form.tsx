@@ -1,37 +1,41 @@
 "use client";
-import { Button, Form, Input, Select } from "antd";
-import { useEffect } from "react";
+import { Button, Form, Input, message, Select } from "antd";
+import { useContext, useEffect } from "react";
 import ObjInputFormList from "./obj-input-form-list";
 import { arr2FormList, obj2FormList } from "@/lib";
 import { ClientCommonConfig } from "@/types/frpc";
+import { FrpcConfCtx } from "@/context";
+import { updateAndReloadConf } from "@/lib/server-action";
+import { produce } from "immer";
+import { stringify } from "smol-toml";
 
-const ProxiesType = [
-  "tcp",
-  "udp",
-  "http",
-  "https",
-  "tcpmux",
-  "stcp",
-  "sudp",
-  "xtcp",
-];
-
-function FrpcCommonConfigForm({ value }: { value?: ClientCommonConfig }) {
-  console.log("value:", value);
+function FrpcCommonConfigForm() {
+  const [messageApi, contextHolder] = message.useMessage();
+  const { config } = useContext(FrpcConfCtx);
+  const { proxies, ...value } = config;
   const [form] = Form.useForm<ClientCommonConfig>();
-  const onFinish = (value: any) => {
+  const onFinish = async (value: ClientCommonConfig) => {
     console.log("value:", value);
+    try {
+      const newFrpc = produce(config, (draft) => {
+        Object.assign(draft, value);
+      });
+      console.log("newFrpc:", newFrpc);
+      await updateAndReloadConf(stringify(newFrpc));
+      messageApi.success("提交成功");
+    } catch (error) {
+      messageApi.error("提交失败");
+    }
   };
 
   useEffect(() => {
-    if (!value) return;
     const data = Object.fromEntries(
       Object.entries(value).map(([key, value]) => [
         key,
-        typeof value === "object"
+        value && typeof value === "object"
           ? Array.isArray(value)
             ? arr2FormList(value)
-            : obj2FormList(value)
+            : obj2FormList(value as Record<string, unknown>)
           : value,
       ])
     );
@@ -39,6 +43,7 @@ function FrpcCommonConfigForm({ value }: { value?: ClientCommonConfig }) {
   }, []);
   return (
     <div>
+      {contextHolder}
       <Form name="dynamic_form_nest_item" form={form} onFinish={onFinish}>
         <Form.Item label="用户名 (user)" name="user">
           <Input />
