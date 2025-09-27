@@ -12,6 +12,9 @@ export async function GET(request: Request) {
       Authorization,
     },
   });
+  if (!res.ok) {
+    return NextResponse.error();
+  }
   const msg = await res.text();
   return NextResponse.json({
     code: 200,

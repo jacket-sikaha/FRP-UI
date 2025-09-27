@@ -12,6 +12,9 @@ export async function GET(request: Request) {
       Authorization,
     },
   });
+  if (!res.ok) {
+    return NextResponse.error();
+  }
   const data = (await res.json()) as StatusDataType;
   const tableData = Object.values(data || [])
     .flatMap((obj) => obj)
