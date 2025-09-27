@@ -11,4 +11,6 @@ export const frpcCommonConfigZh: Record<string, string> = {
   transport: "客户端网络层配置",
   log: "日志配置",
   virtualNet: "虚拟网络配置",
+  includes: "额外的配置文件目录",
+  start: "指定启用部分代理",
 };

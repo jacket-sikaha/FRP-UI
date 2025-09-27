@@ -1,7 +1,5 @@
 import { frpcCommonConfigZh } from "@/types/frpc-common-config-zh";
-import { proxiesZh } from "@/types/proxies-zh";
-import { Descriptions, Tooltip } from "antd";
-import React from "react";
+import { Descriptions, Divider, Space, Tooltip } from "antd";
 
 function DescriptionsItem({
   title = "Info",
@@ -9,7 +7,7 @@ function DescriptionsItem({
   bordered = false,
 }: {
   title?: string;
-  obj: Record<string, unknown>;
+  obj: Record<string, unknown> | string[];
   bordered?: boolean;
 }) {
   const itemsArray = Object.entries(obj).map(([key, value]) => ({
@@ -22,7 +20,20 @@ function DescriptionsItem({
       </div>
     ),
   }));
-  return <Descriptions title={title} bordered={bordered} items={itemsArray} />;
+  return Array.isArray(obj) ? (
+    <div className="flex items-center gap-6">
+      <div className="text-xl font-medium">{title}:</div>
+      <Space
+        split={<Divider type="vertical" style={{ borderColor: "#7cb305" }} />}
+      >
+        {obj.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </Space>
+    </div>
+  ) : (
+    <Descriptions title={title} bordered={bordered} items={itemsArray} />
+  );
 }
 
 function FrpcDescriptions({
