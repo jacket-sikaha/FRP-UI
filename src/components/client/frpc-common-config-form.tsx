@@ -1,27 +1,37 @@
 "use client";
-import { Button, Form, Input, message, Select } from "antd";
-import { useContext, useEffect } from "react";
-import ObjInputFormList from "./obj-input-form-list";
-import { arr2FormList, obj2FormList } from "@/lib";
-import { ClientCommonConfig } from "@/types/frpc";
 import { FrpcConfCtx } from "@/context";
+import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
+import { Button, Form, Input, message } from "antd";
 import { produce } from "immer";
+import { useContext, useEffect } from "react";
 import { stringify } from "smol-toml";
+import ObjInputFormList from "./obj-input-form-list";
 
 function FrpcCommonConfigForm() {
   const [messageApi, contextHolder] = message.useMessage();
   const { config } = useContext(FrpcConfCtx);
-  const { proxies, ...value } = config;
-  const [form] = Form.useForm<ClientCommonConfig>();
-  const onFinish = async (value: ClientCommonConfig) => {
-    console.log("value:", value);
+  const { proxies, ...clientConfig } = config;
+  console.log("first", clientConfig);
+  const [form] = Form.useForm<Record<string, unknown>>();
+  const onFinish = async (val: Record<string, unknown>) => {
+    const data = Object.fromEntries(
+      Object.entries(val).map(([key, value]) => [
+        key,
+        typeof value === "object"
+          ? ["includes", "start"].includes(key)
+            ? formList2Arr(value as { value: string }[])
+            : formList2Obj(value as { key: string; value: unknown }[])
+          : value,
+      ])
+    );
     try {
       const newFrpc = produce(config, (draft) => {
-        Object.assign(draft, value);
+        Object.assign(draft, data);
       });
       console.log("newFrpc:", newFrpc);
-      await updateAndReloadConf(stringify(newFrpc));
+      const res = await updateAndReloadConf(stringify(newFrpc));
+      if (!res) throw "提交失败";
       messageApi.success("提交成功");
     } catch (error) {
       messageApi.error("提交失败");
@@ -29,22 +39,32 @@ function FrpcCommonConfigForm() {
   };
 
   useEffect(() => {
+    console.log("FrpcCommonConfigForm  sssssssss");
     const data = Object.fromEntries(
-      Object.entries(value).map(([key, value]) => [
+      Object.entries(clientConfig).map(([key, value]) => [
         key,
-        value && typeof value === "object"
+        typeof value === "object"
           ? Array.isArray(value)
             ? arr2FormList(value)
             : obj2FormList(value as Record<string, unknown>)
-          : value,
+          : value ?? "--",
       ])
     );
     form.setFieldsValue(data);
-  }, []);
+    return () => {
+      console.log("FrpcCommonConfigForm end");
+    };
+  }, [config]);
+
   return (
     <div>
       {contextHolder}
-      <Form name="dynamic_form_nest_item" form={form} onFinish={onFinish}>
+      <Form
+        name="frpcCommonConfig"
+        clearOnDestroy
+        form={form}
+        onFinish={onFinish}
+      >
         <Form.Item label="用户名 (user)" name="user">
           <Input />
         </Form.Item>

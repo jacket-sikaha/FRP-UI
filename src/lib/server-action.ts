@@ -1,6 +1,7 @@
 "use server";
 
 import { signOut } from "@/auth";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { parse } from "smol-toml";
 
@@ -131,7 +132,7 @@ export const updateConf = async (val?: string) => {
       headers: {
         cookie: cookieHeader,
       },
-      body: JSON.stringify(val),
+      body: val,
     });
     const data = await res.json();
     console.log("data", data, res.ok);
@@ -142,7 +143,6 @@ export const updateConf = async (val?: string) => {
 };
 
 export const updateAndReloadConf = async (val?: string) => {
-  console.log("val222222222222222", val);
   if (!val) {
     return false;
   }
@@ -157,9 +157,9 @@ export const updateAndReloadConf = async (val?: string) => {
       headers: {
         cookie: cookieHeader,
       },
-      body: JSON.stringify(val),
+      body: val,
     });
-    await res.json();
+    revalidatePath("/manage/*");
     if (res.ok) {
       console.log("update success");
       const url = `${protocol}://${host}/frp-api/reload`;
