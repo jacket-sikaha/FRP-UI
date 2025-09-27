@@ -21,19 +21,19 @@ export async function GET(request: Request) {
 
 // // 更新配置文件
 export async function PUT(request: Request) {
-  const Authorization = await getAuth(request);
-  if (!Authorization) {
+  const authorization = await getAuth(request);
+  if (!authorization) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   const data = await request.text();
-  console.log("data111111111111111:", data.slice(0, 130));
   const res = await fetch(`${process.env.ORIGIN_SERVER}/api/config`, {
     method: "PUT",
-    headers: request.headers,
+    headers: {
+      authorization,
+    },
     body: data,
   });
   const msg = await res.text();
-  console.log("first", res.ok, msg);
   if (!res.ok) {
     return NextResponse.error();
   }
