@@ -5,7 +5,7 @@ import { proxiesZh } from "@/types/proxies-zh";
 import { Button, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import ProxiesForm from "./proxies-form";
 import { FrpcConfCtx } from "@/context";
 import { FrpcConfig } from "@/types/frpc";
@@ -19,7 +19,7 @@ function DynamicTable({
 }) {
   const { proxies = [] } = frpc;
   const [show, setShow] = useState(false);
-  const [val, setVal] = useState<ProxyBaseConfig>();
+  const tableItem = useRef<ProxyBaseConfig>(undefined);
   const tmp = useMemo(() => Object.assign({}, ...proxies), []);
   const father = Object.entries(tmp).filter(
     ([key, value]) => typeof value !== "object"
@@ -43,7 +43,7 @@ function DynamicTable({
           <a
             onClick={() => {
               setShow(true);
-              setVal(record as ProxyBaseConfig);
+              tableItem.current = record as ProxyBaseConfig;
             }}
           >
             修改
@@ -68,7 +68,7 @@ function DynamicTable({
         </Button>
         <ProxiesForm
           show={show}
-          value={val}
+          value={tableItem.current}
           size="default"
           onClose={() => setShow(false)}
         />

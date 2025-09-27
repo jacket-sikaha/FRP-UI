@@ -1,16 +1,16 @@
 "use client";
-import { ProxyBaseConfig } from "@/types/proxies";
-import { Button, Form, Input, message, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import ObjInputFormList from "./obj-input-form-list";
+import { useFrpcConf } from "@/context";
 import { formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
+import { ProxyBaseConfig } from "@/types/proxies";
+import { Button, Form, Input, message, Select } from "antd";
+import { produce } from "immer";
+import { useEffect } from "react";
 import { stringify } from "smol-toml";
 import DrawerContainer, {
   DrawerContainerProps,
 } from "../server/drawer-container";
-import { useFrpcConf } from "@/context";
-import { produce } from "immer";
+import ObjInputFormList from "./obj-input-form-list";
 
 const ProxiesType = [
   "tcp",
@@ -30,49 +30,58 @@ function ProxiesForm({
 }: { value?: ProxyBaseConfig } & DrawerContainerProps) {
   const [messageApi, contextHolder] = message.useMessage();
   const { config, setConfig } = useFrpcConf();
-  const [form] = Form.useForm<ProxyBaseConfig>();
-  const onFinish = async (val: ProxyBaseConfig) => {
+  const [form] = Form.useForm<Record<string, unknown>>();
+  const onFinish = async (val: Record<string, unknown>) => {
     console.log("value:", value);
     const data = Object.fromEntries(
       Object.entries(val).map(([key, value]) => [
         key,
-        typeof value === "object" ? formList2Obj(value) : value,
+        typeof value === "object"
+          ? formList2Obj(value as { key: string; value: unknown }[])
+          : value,
       ])
     );
     try {
       const newFrpc = produce(config, (draft) => {
-        const index = draft.proxies.findIndex((item) => item.id === value?.id);
-        console.log(index);
-        if (index === -1) return;
-        draft.proxies[index] = data as ProxyBaseConfig;
-        // draft.proxies = draft.proxies.map((item) =>
-        //   item.id === value.id ? value : item
-        // );
+        draft.proxies.forEach((item, idx) => {
+          if (item.id === value?.id) {
+            draft.proxies[idx] = data as ProxyBaseConfig;
+          }
+          delete item.id;
+        });
       });
-      console.log("data:", newFrpc);
-      await updateAndReloadConf(stringify(newFrpc));
+      console.log("data:", newFrpc.proxies);
+      const res = await updateAndReloadConf(stringify(newFrpc));
+      if (!res) throw "提交失败";
       messageApi.success("提交成功");
+      onClose?.();
     } catch (error) {
       messageApi.error("提交失败");
     }
   };
 
   useEffect(() => {
-    if (!value) return;
+    if (!value || !show) return;
     const data = Object.fromEntries(
       Object.entries(value).map(([key, value]) => [
         key,
         typeof value === "object" ? obj2FormList(value) : value,
       ])
     );
-    form.setFieldsValue(data);
-  }, [value]);
+    // 延迟设置，确保组件已渲染
+    const timer = setTimeout(() => {
+      form.setFieldsValue(data);
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [show]);
 
   return (
     <div>
       {contextHolder}
       <DrawerContainer show={show} onClose={onClose} size={size}>
-        <Form name="dynamic_form_nest_item" form={form} onFinish={onFinish}>
+        <Form name="proxies" clearOnDestroy form={form} onFinish={onFinish}>
           <Form.Item
             label="代理名称 (name)"
             name="name"
