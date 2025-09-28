@@ -1,6 +1,7 @@
 {
   "name": "frp-ui",
   "private": true,
+  "version": "2.0.0",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
