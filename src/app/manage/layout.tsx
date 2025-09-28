@@ -1,8 +1,8 @@
 "use client";
 
 import ServerSlider from "@/components/server/slider";
-import { App, Layout, theme } from "antd";
-import React from "react";
+import { App, Layout, Spin, theme } from "antd";
+import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -25,17 +25,19 @@ export default function RootLayout({
   } = theme.useToken();
 
   return (
-    <div className="grid grid-cols-[auto_1fr] w-full h-full">
-      <ServerSlider />
+    <Suspense fallback={<Spin fullscreen />}>
+      <div className="grid grid-cols-[auto_1fr] w-full h-full">
+        <ServerSlider />
 
-      <div className="p-3 bg-slate-100">
-        {/* // 提供 client 至 App */}
-        <App>
-          <QueryClientProvider client={queryClient}>
-            <Content>{children}</Content>
-          </QueryClientProvider>
-        </App>
+        <div className="p-3 bg-slate-100">
+          {/* // 提供 client 至 App */}
+          <App>
+            <QueryClientProvider client={queryClient}>
+              <Content>{children}</Content>
+            </QueryClientProvider>
+          </App>
+        </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
