@@ -82,9 +82,10 @@ export const signOutAction = async () => signOut();
 export const reloadConf = async () => {
   try {
     const header = await headers();
-    const host = header.get("host") || "";
-    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-    const fullUrl = `${protocol}://${host}/frp-api/reload`;
+    const referer = header.get("referer") || "";
+    if (!referer) return false;
+    const url = new URL(referer);
+    const fullUrl = `${url.origin}/frp-api/reload`;
     const cookieHeader = header.get("cookie") || "";
     const res = await fetch(fullUrl, {
       headers: {
@@ -101,9 +102,10 @@ export const reloadConf = async () => {
 export const getConf = async () => {
   try {
     const header = await headers();
-    const host = header.get("host") || "";
-    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const referer = header.get("referer") || "";
+    if (!referer) return false;
+    const url = new URL(referer);
+    const fullUrl = `${url.origin}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
     const res = await fetch(fullUrl, {
       headers: {
@@ -118,14 +120,13 @@ export const getConf = async () => {
   }
 };
 export const updateConf = async (val?: string) => {
-  if (!val) {
-    return false;
-  }
+  if (!val) return false;
   try {
     const header = await headers();
-    const host = header.get("host") || "";
-    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const referer = header.get("referer") || "";
+    if (!referer) return false;
+    const url = new URL(referer);
+    const fullUrl = `${url.origin}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
     const res = await fetch(fullUrl, {
       method: "PUT",
@@ -143,14 +144,13 @@ export const updateConf = async (val?: string) => {
 };
 
 export const updateAndReloadConf = async (val?: string) => {
-  if (!val) {
-    return false;
-  }
+  if (!val) return false;
   try {
     const header = await headers();
-    const host = header.get("host") || "";
-    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-    const fullUrl = `${protocol}://${host}/frp-api/config`;
+    const referer = header.get("referer") || "";
+    if (!referer) return false;
+    const url = new URL(referer);
+    const fullUrl = `${url.origin}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
     const res = await fetch(fullUrl, {
       method: "PUT",
@@ -162,8 +162,8 @@ export const updateAndReloadConf = async (val?: string) => {
     revalidatePath("/manage/*");
     if (res.ok) {
       console.log("update success");
-      const url = `${protocol}://${host}/frp-api/reload`;
-      const res = await fetch(url, {
+      const reloadUrl = `${url.origin}/frp-api/reload`;
+      const res = await fetch(reloadUrl, {
         headers: {
           cookie: cookieHeader,
         },
