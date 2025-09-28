@@ -54,9 +54,10 @@ function ProxiesForm({
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
       messageApi.success("提交成功");
-      onClose?.();
     } catch (error) {
       messageApi.error("提交失败");
+    } finally {
+      onClose?.();
     }
   };
 
