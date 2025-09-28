@@ -2,13 +2,9 @@
 import { useRef } from "react";
 import CodeMirrorEditor, { EditorRefType } from "./editor-view";
 import { Button, message } from "antd";
+import { reloadConf, updateConf } from "@/lib/server-action";
 
-function FrpEditor({
-  value = "",
-  height = "300",
-  updateConf = async (val?: string) => false,
-  reloadConf = async () => false,
-}) {
+function FrpEditor({ value = "", height = "300" }) {
   const editorRef = useRef<EditorRefType>(null);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -19,7 +15,6 @@ function FrpEditor({
         <Button
           onClick={async () => {
             const conf = editorRef.current?.getValue();
-            console.log(conf);
             const res = await updateConf(conf);
             if (res) {
               messageApi.success("配置更新成功");
