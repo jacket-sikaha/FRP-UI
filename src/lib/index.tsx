@@ -10,6 +10,7 @@ export const obj2FormList = (obj: Record<string, unknown>) => {
 };
 
 export const formList2Obj = (arr: { key: string; value: unknown }[]) => {
+  if (!arr || arr.length === 0) return undefined;
   return Object.fromEntries(arr.map((item) => [item.key, item.value]));
 };
 
@@ -18,5 +19,6 @@ export const arr2FormList = (arr: string[]) => {
 };
 
 export const formList2Arr = (arr: { value: string }[]) => {
+  if (!arr || arr.length === 0) return undefined;
   return arr.map((item) => item.value);
 };
