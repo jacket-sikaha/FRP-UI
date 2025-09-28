@@ -22,7 +22,7 @@ function DescriptionsItem({
   }));
   return Array.isArray(obj) ? (
     <div className="flex items-center gap-6">
-      <div className="text-xl font-medium">{title}:</div>
+      <div className="text-base font-bold">{title}:</div>
       <Space
         split={<Divider type="vertical" style={{ borderColor: "#7cb305" }} />}
       >

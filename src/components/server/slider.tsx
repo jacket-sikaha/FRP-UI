@@ -6,20 +6,21 @@ const { Header, Content, Footer, Sider } = Layout;
 function ServerSlider() {
   return (
     <div>
-      <Sider breakpoint="lg" collapsedWidth="0" className="h-full">
+      <Sider breakpoint="lg" collapsedWidth="0" className="h-full py-2">
         <Menu
+          className="sticky top-0"
           theme="dark"
           mode="inline"
           defaultSelectedKeys={["1"]}
           items={[
             {
               key: "1",
-              label: <Link href={"/"}>配置状态</Link>,
+              label: <Link href={"/manage"}>配置状态</Link>,
             },
-            {
-              key: "2",
-              label: <Link href={"/manage/frps"}>FRP服务器配置</Link>,
-            },
+            // {
+            //   key: "2",
+            //   label: <Link href={"/manage/frps"}>FRP服务器配置</Link>,
+            // },
             {
               key: "3",
               label: "FRP客户端配置",
