@@ -5,7 +5,6 @@ export default async function FrpConfPage() {
   const header = await headers();
   const host = header.get("host");
   const cookieHeader = header.get("cookie") || "";
-  console.log("cookieHeader", cookieHeader);
   // 2. 发起请求时，手动携带 cookie
   const res = await fetch(`http://${host}/frp-api/config`, {
     headers: {
@@ -56,12 +55,7 @@ export default async function FrpConfPage() {
   return (
     <div className="flex flex-col items-center h-full">
       <div className="md:w-2xl max-w-4xl w-sm">
-        <FrpEditor
-          value={conf}
-          height="500"
-          updateConf={updateConf}
-          reloadConf={reloadConf}
-        />
+        <FrpEditor value={conf} height="500" />
       </div>
     </div>
   );
