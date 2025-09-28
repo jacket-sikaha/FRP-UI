@@ -5,7 +5,6 @@ export default auth(async (req) => {
 
   if (!req.auth && req.nextUrl.pathname !== "/auth/signin") {
     const newUrl = new URL("/auth/signin", req.nextUrl.origin);
-    console.log("newUrl:", newUrl);
     return Response.redirect(newUrl);
   }
 

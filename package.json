@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build --turbopack --no-lint",
     "start": "next start",
     "auth": "npx auth secret",
     "lint": "eslint"

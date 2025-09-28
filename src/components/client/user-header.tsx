@@ -1,11 +1,14 @@
-import { auth } from "@/auth";
+"use client";
+
 import { signOutAction } from "@/lib/server-action";
 import { Avatar } from "antd";
+import { User } from "next-auth";
+import { useSession } from "next-auth/react";
 import React from "react";
 
-async function UserHeader() {
-  const session = await auth();
-  const user = session?.user;
+function UserHeader() {
+  const { data: session } = useSession();
+  const user = session?.user as User & { username: string };
 
   return (
     <header className="bg-white shadow-sm">
@@ -54,9 +57,9 @@ async function UserHeader() {
                 <a
                   href="#"
                   className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                  //   onClick={() => {
-                  // signOutAction();
-                  //   }}
+                  onClick={async () => {
+                    signOutAction();
+                  }}
                 >
                   退出
                 </a>

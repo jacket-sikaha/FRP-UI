@@ -1,4 +1,4 @@
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth, { CredentialsSignin, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import { createBasicAuthHeader } from "./lib";
@@ -16,14 +16,16 @@ const providers: Provider[] = [
       password: { label: "Password", type: "password" },
     },
     authorize: async (credentials) => {
-      console.log("credentials:", credentials);
       const { username, password } = credentials;
       if (!username || !password) {
         throw new Error("Invalid credentials.");
       }
       try {
         // 1. 创建 Basic Auth 头部
-        const basicAuthHeader = createBasicAuthHeader(username, password);
+        const basicAuthHeader = createBasicAuthHeader(
+          username as string,
+          password as string
+        );
 
         // 2. 调用需要 Basic Auth 的外部 API 进行验证
         const apiResponse = await fetch(process.env.ORIGIN_SERVER as string, {
@@ -62,9 +64,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   jwt: {
     maxAge: maxAge, // 单位：秒
   },
-
+  trustHost: true,
   // 3. 配置加密密钥（生产环境必须通过环境变量设置）
-  // secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET,
   providers,
   pages: {
     signIn: "/auth/signin",
@@ -74,7 +76,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         // 首次登录设置过期时间
-        const { basicAuthHeader, ...safeUser } = user;
+        const userWithBasicAuth = user as {
+          basicAuthHeader: string;
+        } & User;
+        const { basicAuthHeader, ...safeUser } = userWithBasicAuth;
         token.expires = Date.now() + maxAge * 1000;
         token.user = { ...safeUser };
         token.basicAuthHeader = basicAuthHeader;
@@ -96,7 +101,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // 将用户信息添加到 session
       if (token && session.user) {
         session.user = token.user as typeof session.user;
-        session.ddd = dayjs(session.expires).format("YYYY-MM-DD HH:mm:ss");
         // session.token = token;
       }
       return session;
