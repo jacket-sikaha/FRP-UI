@@ -57,9 +57,6 @@ function DynamicTable({
     <FrpcConfCtx.Provider
       value={{
         config: frpc,
-        setConfig: function (config: FrpcConfig): void {
-          throw new Error("Function not implemented.");
-        },
       }}
     >
       <div>

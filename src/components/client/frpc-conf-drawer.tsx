@@ -13,7 +13,6 @@ function FrpcConfDrawer({ value }: { value?: FrpcConfig }) {
     <FrpcConfCtx.Provider
       value={{
         config: value || ({} as FrpcConfig),
-        setConfig: () => {},
       }}
     >
       <div>
