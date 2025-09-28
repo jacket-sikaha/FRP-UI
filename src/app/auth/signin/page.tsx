@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
@@ -10,9 +10,6 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { data: session, status, update } = useSession();
-  console.log("status:", status);
-  console.log("session:", session);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +26,7 @@ export default function SignIn() {
       if (result?.error) {
         setError("用户名或密码错误");
       } else {
-        router.push("/");
+        router.push("/manage");
         router.refresh();
       }
     } catch (error) {
@@ -147,18 +144,6 @@ export default function SignIn() {
             </button>
           </div>
         </form>
-
-        <div className="mt-6 bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-800 mb-2">
-            演示账号信息
-          </h3>
-          <p className="text-xs text-gray-600">
-            用户名: <span className="font-semibold">demo</span>
-          </p>
-          <p className="text-xs text-gray-600">
-            密码: <span className="font-semibold">password</span>
-          </p>
-        </div>
       </div>
     </div>
   );

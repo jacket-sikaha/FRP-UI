@@ -1,15 +1,9 @@
 "use client";
 
-import React from "react";
-import {
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
-import { App, Layout, Menu, theme } from "antd";
-import Link from "next/link";
-import { QueryClient, QueryClientProvider } from "react-query";
 import ServerSlider from "@/components/server/slider";
+import { App, Layout, theme } from "antd";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 const { Header, Content, Footer, Sider } = Layout;
 
 // linux服务器上运行有问题，暂时不知道怎么处理
