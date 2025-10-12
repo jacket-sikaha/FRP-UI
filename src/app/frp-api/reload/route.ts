@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     },
   });
   if (!res.ok) {
-    return NextResponse.error();
+    return NextResponse.json({ error: res.statusText }, { status: res.status });
   }
   const msg = await res.text();
   return NextResponse.json({

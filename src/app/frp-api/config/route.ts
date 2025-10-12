@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { getAuth } from "@/lib/token";
+import { NextResponse } from "next/server";
 
 // 获取配置文件
-export async function GET(request: Request) {
+export async function GET(request: Request, response: NextResponse) {
   const authorization = await getAuth(request);
   if (!authorization) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -12,8 +12,9 @@ export async function GET(request: Request) {
       authorization,
     },
   });
+
   if (!res.ok) {
-    return NextResponse.error();
+    return NextResponse.json({ error: res.statusText }, { status: res.status });
   }
   const config = await res.text();
   return NextResponse.json(config);
@@ -35,7 +36,7 @@ export async function PUT(request: Request) {
   });
   const msg = await res.text();
   if (!res.ok) {
-    return NextResponse.error();
+    return NextResponse.json({ error: res.statusText }, { status: res.status });
   }
   return NextResponse.json({
     code: 200,

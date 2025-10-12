@@ -11,7 +11,7 @@ services:
       # 例如：NEXTAUTH_URL=http://localhost:3000
       - ORIGIN_SERVER=http://localhost:3000
       - AUTH_SECRET=your-secret # 替换为实际的AUTH_SECRET
-    volumes:
+    volumes: []
       # 如果需要持久化数据或配置文件，可以添加卷挂载
       # - ./data:/app/data
     restart: unless-stopped

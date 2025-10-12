@@ -4,6 +4,7 @@ import { signOut } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { parse } from "smol-toml";
+import clientFetch from "./request";
 
 // 对于提交请求这种自定义的请求函数需要在client组件里使用，需要使用server action这种配置写法
 
@@ -87,7 +88,7 @@ export const reloadConf = async () => {
     const url = new URL(referer);
     const fullUrl = `${url.origin}/frp-api/reload`;
     const cookieHeader = header.get("cookie") || "";
-    const res = await fetch(fullUrl, {
+    const res = await clientFetch(fullUrl, {
       headers: {
         cookie: cookieHeader,
       },
@@ -99,25 +100,21 @@ export const reloadConf = async () => {
     return false;
   }
 };
-export const getConf = async () => {
-  try {
-    const header = await headers();
-    const referer = header.get("referer") || "";
-    if (!referer) return false;
-    const url = new URL(referer);
-    const fullUrl = `${url.origin}/frp-api/config`;
-    const cookieHeader = header.get("cookie") || "";
-    const res = await fetch(fullUrl, {
-      headers: {
-        cookie: cookieHeader,
-      },
-      // next: { revalidate: false },
-    });
-    const data = await res.json();
-    return parse(data);
-  } catch (error) {
-    return false;
-  }
+export const getConf = async (needText = false) => {
+  const header = await headers();
+  const referer = header.get("referer") || "";
+  if (!referer) return false;
+  const url = new URL(referer);
+  const fullUrl = `${url.origin}/frp-api/config`;
+  const cookieHeader = header.get("cookie") || "";
+  const res = await clientFetch(fullUrl, {
+    headers: {
+      cookie: cookieHeader,
+    },
+    // next: { revalidate: false },
+  });
+  const data = await res.json();
+  return needText ? data : parse(data);
 };
 export const updateConf = async (val?: string) => {
   if (!val) return false;
@@ -128,7 +125,7 @@ export const updateConf = async (val?: string) => {
     const url = new URL(referer);
     const fullUrl = `${url.origin}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
-    const res = await fetch(fullUrl, {
+    const res = await clientFetch(fullUrl, {
       method: "PUT",
       headers: {
         cookie: cookieHeader,
@@ -152,7 +149,7 @@ export const updateAndReloadConf = async (val?: string) => {
     const url = new URL(referer);
     const fullUrl = `${url.origin}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
-    const res = await fetch(fullUrl, {
+    const res = await clientFetch(fullUrl, {
       method: "PUT",
       headers: {
         cookie: cookieHeader,
@@ -163,7 +160,7 @@ export const updateAndReloadConf = async (val?: string) => {
     if (res.ok) {
       console.log("update success");
       const reloadUrl = `${url.origin}/frp-api/reload`;
-      const res = await fetch(reloadUrl, {
+      const res = await clientFetch(reloadUrl, {
         headers: {
           cookie: cookieHeader,
         },

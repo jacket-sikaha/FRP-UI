@@ -1,5 +1,6 @@
 "use client";
 
+import clientFetch from "@/lib/request";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
@@ -9,7 +10,7 @@ export default function Home() {
   // 查询
   const { data, isFetching } = useQuery({
     queryKey: ["frp-status"],
-    queryFn: () => fetch(`/frp-api/status`).then((res) => res.json()),
+    queryFn: () => clientFetch(`/frp-api/status`).then((res) => res.json()),
   });
 
   const defaultColumns: ColumnsType<StatusTableDataType> = [

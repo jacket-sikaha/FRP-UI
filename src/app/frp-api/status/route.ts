@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     },
   });
   if (!res.ok) {
-    return NextResponse.error();
+    return NextResponse.json({ error: res.statusText }, { status: res.status });
   }
   const data = (await res.json()) as StatusDataType;
   const tableData = Object.values(data || [])
