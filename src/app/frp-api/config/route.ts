@@ -2,7 +2,7 @@ import { getAuth } from "@/lib/token";
 import { NextResponse } from "next/server";
 
 // 获取配置文件
-export async function GET(request: Request, response: NextResponse) {
+export async function GET(request: Request) {
   const authorization = await getAuth(request);
   if (!authorization) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
