@@ -12,7 +12,7 @@ function FrpcCommonConfigForm() {
   const [messageApi, contextHolder] = message.useMessage();
   const { config } = useContext(FrpcConfCtx);
   const { proxies, ...clientConfig } = config;
-  console.log("first", clientConfig);
+
   const [form] = Form.useForm<Record<string, unknown>>();
   const onFinish = async (val: Record<string, unknown>) => {
     const data = Object.fromEntries(
@@ -29,7 +29,7 @@ function FrpcCommonConfigForm() {
       const newFrpc = produce(config, (draft) => {
         Object.assign(draft, data);
       });
-      console.log("newFrpc:", newFrpc);
+
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
       messageApi.success("提交成功");
@@ -68,10 +68,18 @@ function FrpcCommonConfigForm() {
         <Form.Item label="用户名 (user)" name="user">
           <Input />
         </Form.Item>
-        <Form.Item label="连接服务端的地址 (serverAddr)" name="serverAddr">
+        <Form.Item
+          label="连接服务端的地址 (serverAddr)"
+          name="serverAddr"
+          required
+        >
           <Input />
         </Form.Item>
-        <Form.Item label="连接服务端的端口 (serverPort)" name="serverPort">
+        <Form.Item
+          label="连接服务端的端口 (serverPort)"
+          name="serverPort"
+          required
+        >
           <Input />
         </Form.Item>
         <Form.Item
