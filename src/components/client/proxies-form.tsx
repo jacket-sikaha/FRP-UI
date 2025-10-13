@@ -3,7 +3,7 @@ import { useFrpcConf } from "@/context";
 import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
 import { ProxyBaseConfig } from "@/types/proxies";
-import { Button, Form, Input, message, Select } from "antd";
+import { App, Button, Form, Input, message, Select } from "antd";
 import { produce } from "immer";
 import { useEffect } from "react";
 import { stringify } from "smol-toml";
@@ -28,7 +28,7 @@ function ProxiesForm({
   size,
   onClose,
 }: { value?: ProxyBaseConfig } & DrawerContainerProps) {
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message, modal } = App.useApp();
   const { config, setConfig } = useFrpcConf();
   const [form] = Form.useForm<Record<string, unknown>>();
   const onFinish = async (val: Record<string, unknown>) => {
@@ -57,9 +57,9 @@ function ProxiesForm({
       });
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
-      messageApi.success("提交成功");
+      message.success("提交成功");
     } catch (error) {
-      messageApi.error("提交失败");
+      message.error("提交失败");
     } finally {
       onClose?.();
     }
@@ -88,7 +88,6 @@ function ProxiesForm({
 
   return (
     <div>
-      {contextHolder}
       <DrawerContainer show={show} onClose={onClose} size={size}>
         <Form name="proxies" clearOnDestroy form={form} onFinish={onFinish}>
           <Form.Item

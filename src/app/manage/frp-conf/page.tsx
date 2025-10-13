@@ -1,6 +1,5 @@
 import FrpEditor from "@/components/client/frp-editor";
 import { getConf } from "@/lib/server-action";
-import { headers } from "next/headers";
 
 export default async function FrpConfPage() {
   const data = (await getConf(true)) || {};

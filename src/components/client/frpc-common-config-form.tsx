@@ -2,14 +2,14 @@
 import { FrpcConfCtx } from "@/context";
 import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
-import { Button, Form, Input, message } from "antd";
+import { App, Button, Form, Input, message } from "antd";
 import { produce } from "immer";
 import { useContext, useEffect } from "react";
 import { stringify } from "smol-toml";
 import ObjInputFormList from "./obj-input-form-list";
 
 function FrpcCommonConfigForm() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
   const { config } = useContext(FrpcConfCtx);
   const { proxies, ...clientConfig } = config;
 
@@ -32,9 +32,9 @@ function FrpcCommonConfigForm() {
 
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
-      messageApi.success("提交成功");
+      message.success("提交成功");
     } catch (error) {
-      messageApi.error("提交失败");
+      message.error("提交失败");
     }
   };
 
@@ -58,7 +58,6 @@ function FrpcCommonConfigForm() {
 
   return (
     <div>
-      {contextHolder}
       <Form
         name="frpcCommonConfig"
         clearOnDestroy

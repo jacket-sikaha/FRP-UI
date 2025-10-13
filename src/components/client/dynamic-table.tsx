@@ -2,7 +2,7 @@
 
 import { ProxyBaseConfig } from "@/types/proxies";
 import { proxiesZh } from "@/types/proxies-zh";
-import { Button, message, Modal, Table, Tooltip } from "antd";
+import { App, Button, message, Modal, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
 import { useMemo, useRef, useState } from "react";
@@ -22,8 +22,7 @@ function DynamicTable({
 }) {
   const { proxies = [] } = frpc;
   const [show, setShow] = useState(false);
-  const [modal, contextHolder] = Modal.useModal();
-  const [messageApi, contextHolderMessage] = message.useMessage();
+  const { message, modal } = App.useApp();
   const tableItem = useRef<ProxyBaseConfig>(undefined);
   const tmp = useMemo(() => Object.assign({}, ...proxies), []);
   const father = Object.entries(tmp).filter(
@@ -42,9 +41,9 @@ function DynamicTable({
       });
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
-      messageApi.success("提交成功");
+      message.success("提交成功");
     } catch (error) {
-      messageApi.error("提交失败");
+      message.error("提交失败");
     }
   };
 
@@ -99,8 +98,6 @@ function DynamicTable({
         config: frpc,
       }}
     >
-      {contextHolder}
-      {contextHolderMessage}
       <div>
         <Button
           className="py-3"

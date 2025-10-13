@@ -1,25 +1,24 @@
 "use client";
 import { useRef } from "react";
 import CodeMirrorEditor, { EditorRefType } from "./editor-view";
-import { Button, message } from "antd";
+import { App, Button, message } from "antd";
 import { reloadConf, updateConf } from "@/lib/server-action";
 
 function FrpEditor({ value = "", height = "300" }) {
   const editorRef = useRef<EditorRefType>(null);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   return (
     <div>
-      {contextHolder}
       <div className="flex items-center gap-5 p-3">
         <Button
           onClick={async () => {
             const conf = editorRef.current?.getValue();
             const res = await updateConf(conf);
             if (res) {
-              messageApi.success("配置更新成功");
+              message.success("配置更新成功");
             } else {
-              messageApi.error("配置更新失败");
+              message.error("配置更新失败");
             }
           }}
         >
@@ -29,9 +28,9 @@ function FrpEditor({ value = "", height = "300" }) {
           onClick={async () => {
             const res = await reloadConf();
             if (res) {
-              messageApi.success("配置重载成功");
+              message.success("配置重载成功");
             } else {
-              messageApi.error("配置重载失败");
+              message.error("配置重载失败");
             }
           }}
         >
