@@ -44,10 +44,14 @@ function ProxiesForm({
     );
     try {
       const newFrpc = produce(config, (draft) => {
+        if (!value?.id) {
+          draft.proxies.push(data as ProxyBaseConfig);
+        } else {
+          const idx = draft.proxies.findIndex((item) => item.id === value?.id);
+          if (idx === -1) throw "代理不存在";
+          draft.proxies[idx] = data as ProxyBaseConfig;
+        }
         draft.proxies.forEach((item, idx) => {
-          if (item.id === value?.id) {
-            draft.proxies[idx] = data as ProxyBaseConfig;
-          }
           delete item.id;
         });
       });

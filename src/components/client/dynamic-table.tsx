@@ -2,13 +2,16 @@
 
 import { ProxyBaseConfig } from "@/types/proxies";
 import { proxiesZh } from "@/types/proxies-zh";
-import { Button, Table, Tooltip } from "antd";
+import { Button, message, Modal, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
 import { useMemo, useRef, useState } from "react";
 import ProxiesForm from "./proxies-form";
 import { FrpcConfCtx } from "@/context";
 import { FrpcConfig } from "@/types/frpc";
+import { updateAndReloadConf } from "@/lib/server-action";
+import { stringify } from "smol-toml";
+import { produce } from "immer";
 
 function DynamicTable({
   frpc = {
@@ -19,11 +22,32 @@ function DynamicTable({
 }) {
   const { proxies = [] } = frpc;
   const [show, setShow] = useState(false);
+  const [modal, contextHolder] = Modal.useModal();
+  const [messageApi, contextHolderMessage] = message.useMessage();
   const tableItem = useRef<ProxyBaseConfig>(undefined);
   const tmp = useMemo(() => Object.assign({}, ...proxies), []);
   const father = Object.entries(tmp).filter(
     ([key, value]) => typeof value !== "object"
   );
+
+  const onDelete = async (id: string) => {
+    try {
+      const newFrpc = produce(frpc, (draft) => {
+        draft.proxies.forEach((item, idx) => {
+          if (item.id === id) {
+            draft.proxies.splice(idx, 1);
+          }
+          delete item.id;
+        });
+      });
+      const res = await updateAndReloadConf(stringify(newFrpc));
+      if (!res) throw "提交失败";
+      messageApi.success("提交成功");
+    } catch (error) {
+      messageApi.error("提交失败");
+    }
+  };
+
   const dynamicColumns: ColumnsType = [
     ...father.map(([key, value]) => ({
       title: <Tooltip title={key}>{proxiesZh[key] || key}</Tooltip>,
@@ -40,14 +64,30 @@ function DynamicTable({
       key: "operation",
       render: (text, record) => {
         return (
-          <a
-            onClick={() => {
-              setShow(true);
-              tableItem.current = record as ProxyBaseConfig;
-            }}
-          >
-            修改
-          </a>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => {
+                setShow(true);
+                tableItem.current = record as ProxyBaseConfig;
+              }}
+            >
+              修改
+            </Button>
+            <Button
+              danger
+              onClick={() => {
+                modal.confirm({
+                  title: "确认删除吗？",
+                  okText: "确认",
+                  cancelText: "取消",
+                  okType: "danger",
+                  onOk: () => onDelete(record.id),
+                });
+              }}
+            >
+              删除
+            </Button>
+          </div>
         );
       },
     },
@@ -59,8 +99,17 @@ function DynamicTable({
         config: frpc,
       }}
     >
+      {contextHolder}
+      {contextHolderMessage}
       <div>
-        <Button className="py-3" type="primary" onClick={() => setShow(true)}>
+        <Button
+          className="py-3"
+          type="primary"
+          onClick={() => {
+            setShow(true);
+            tableItem.current = undefined;
+          }}
+        >
           添加代理
         </Button>
         <ProxiesForm
