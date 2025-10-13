@@ -10,7 +10,8 @@ export type ProxyBaseConfig = {
   };
   healthCheck?: HealthCheckConfig;
   [key: string]: any;
-} & ProxyBackend;
+} & ProxyBackend &
+  DomainConfig;
 
 // 代理网络层配置
 export type ProxyTransport = {
@@ -42,4 +43,9 @@ export type HealthCheckConfig = {
     name: string; // Header 名称。
     value: string; // Header 值。
   };
+};
+
+export type DomainConfig = {
+  customDomains?: string[]; // 自定义域名列表
+  subdomain?: string; // 子域名
 };

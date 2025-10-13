@@ -1,7 +1,8 @@
 import { frpcCommonConfigZh } from "@/types/frpc-common-config-zh";
-import { Descriptions, Divider, Space, Tooltip } from "antd";
+import { Descriptions, Tooltip } from "antd";
+import ArrayDescriptions from "./array-descriptions";
 
-function DescriptionsItem({
+export function DescriptionsItem({
   title = "Info",
   obj = {},
   bordered = false,
@@ -21,16 +22,7 @@ function DescriptionsItem({
     ),
   }));
   return Array.isArray(obj) ? (
-    <div className="flex items-center gap-6">
-      <div className="text-base font-bold">{title}:</div>
-      <Space
-        split={<Divider type="vertical" style={{ borderColor: "#7cb305" }} />}
-      >
-        {obj.map((item) => (
-          <div key={item}>{item}</div>
-        ))}
-      </Space>
-    </div>
+    <ArrayDescriptions title={title} obj={obj} />
   ) : (
     <Descriptions title={title} bordered={bordered} items={itemsArray} />
   );
@@ -43,6 +35,7 @@ function FrpcDescriptions({
   items: Record<string, unknown>;
   bordered?: boolean;
 }) {
+  console.log(11111111, items);
   const itemsArray = Object.entries(items)
     .filter(([_, value]) => typeof value !== "object")
     .map(([key, value]) => ({
@@ -50,6 +43,7 @@ function FrpcDescriptions({
       span: 2,
       children: <div>{(value as string) ?? "-"}</div>,
     }));
+
   return (
     <div className="flex flex-col gap-3">
       {itemsArray.length > 0 && (

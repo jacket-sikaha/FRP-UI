@@ -1,6 +1,6 @@
 "use client";
 import { useFrpcConf } from "@/context";
-import { formList2Obj, obj2FormList } from "@/lib";
+import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
 import { ProxyBaseConfig } from "@/types/proxies";
 import { Button, Form, Input, message, Select } from "antd";
@@ -32,12 +32,13 @@ function ProxiesForm({
   const { config, setConfig } = useFrpcConf();
   const [form] = Form.useForm<Record<string, unknown>>();
   const onFinish = async (val: Record<string, unknown>) => {
-    console.log("value:", value);
     const data = Object.fromEntries(
       Object.entries(val).map(([key, value]) => [
         key,
         typeof value === "object"
-          ? formList2Obj(value as { key: string; value: unknown }[])
+          ? ["customDomains"].includes(key)
+            ? formList2Arr(value as { value: string }[])
+            : formList2Obj(value as { key: string; value: unknown }[])
           : value,
       ])
     );
@@ -50,7 +51,6 @@ function ProxiesForm({
           delete item.id;
         });
       });
-      console.log("data:", newFrpc.proxies);
       const res = await updateAndReloadConf(stringify(newFrpc));
       if (!res) throw "提交失败";
       messageApi.success("提交成功");
@@ -64,9 +64,13 @@ function ProxiesForm({
   useEffect(() => {
     if (!value || !show) return;
     const data = Object.fromEntries(
-      Object.entries(value).map(([key, value]) => [
+      Object.entries(value).map(([key, val]) => [
         key,
-        typeof value === "object" ? obj2FormList(value) : value,
+        typeof val === "object"
+          ? Array.isArray(val)
+            ? arr2FormList(val)
+            : obj2FormList(val as Record<string, unknown>)
+          : val ?? "--",
       ])
     );
     // 延迟设置，确保组件已渲染
@@ -111,7 +115,16 @@ function ProxiesForm({
           <Form.Item label="被代理的本地服务端口 (localPort)" name="localPort">
             <Input />
           </Form.Item>
+          <Form.Item label="子域名 (subdomain)" name="subdomain">
+            <Input />
+          </Form.Item>
+
           <ObjInputFormList name="plugin" title="客户端插件配置 (plugin)" />
+          <ObjInputFormList
+            name="customDomains"
+            title="自定义域名列表 (customDomains)"
+            isArray
+          />
           <ObjInputFormList
             name="transport"
             title="代理网络层配置 (transport)"
