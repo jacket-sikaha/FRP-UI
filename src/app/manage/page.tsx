@@ -10,9 +10,12 @@ export default function Home() {
   // 查询
   const { data, isFetching } = useQuery({
     queryKey: ["frp-status"],
-    queryFn: () => clientFetch(`/frp-api/status`).then((res) => res.json()),
+    queryFn: () =>
+      clientFetch(`/frp-api/status`).then((res) => (res.ok ? res.json() : [])),
+    onError: (error) => {
+      console.log("查询状态失败", error);
+    },
   });
-
   const defaultColumns: ColumnsType<StatusTableDataType> = [
     {
       title: "配置名称",

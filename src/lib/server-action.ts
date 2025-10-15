@@ -123,6 +123,10 @@ export const getConf = async (needText = false) => {
     const data = await res.json();
     return needText ? data : parse(data);
   } catch (error) {
+    // 放行重定向错误
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
     console.error("getConf 执行出错:", error);
     // 出错时返回兜底值，避免组件接收 undefined
     return false;

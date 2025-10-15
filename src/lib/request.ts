@@ -14,7 +14,7 @@ async function clientFetch(url: string | URL, options: RequestInit = {}) {
       // 客户端跳转需要中断后续执行
     } else {
       // 服务端：使用Next的redirect函数
-      throw redirect("/auth/signin");
+      redirect(`/auth/signin`);
     }
   }
 
