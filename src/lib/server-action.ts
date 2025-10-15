@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { parse } from "smol-toml";
 import clientFetch from "./request";
+import { getServerBasicUrl } from ".";
 
 // 对于提交请求这种自定义的请求函数需要在client组件里使用，需要使用server action这种配置写法
 
@@ -83,10 +84,13 @@ export const signOutAction = async () => signOut();
 export const reloadConf = async () => {
   try {
     const header = await headers();
-    const referer = header.get("referer") || "";
-    if (!referer) return false;
-    const url = new URL(referer);
-    const fullUrl = `${url.origin}/frp-api/reload`;
+    // Referer 头的设计初衷是标识 "当前请求是从哪个页面跳转过来的"，而直接输入 URL 或强制刷新属于 "无来源" 的请求，浏览器自然不会发送该头信息
+    // if (!referer) {
+    //   console.error("缺少 referer 头信息");
+    //   return false;
+    // }
+    // const url = new URL(referer);
+    const fullUrl = `${getServerBasicUrl(header)}/frp-api/reload`;
     const cookieHeader = header.get("cookie") || "";
     const res = await clientFetch(fullUrl, {
       headers: {
@@ -101,29 +105,34 @@ export const reloadConf = async () => {
   }
 };
 export const getConf = async (needText = false) => {
-  const header = await headers();
-  const referer = header.get("referer") || "";
-  if (!referer) return false;
-  const url = new URL(referer);
-  const fullUrl = `${url.origin}/frp-api/config`;
-  const cookieHeader = header.get("cookie") || "";
-  const res = await clientFetch(fullUrl, {
-    headers: {
-      cookie: cookieHeader,
-    },
-    // next: { revalidate: false },
-  });
-  const data = await res.json();
-  return needText ? data : parse(data);
+  try {
+    const header = await headers();
+    const fullUrl = `${getServerBasicUrl(header)}/frp-api/config`;
+    const cookieHeader = header.get("cookie") || "";
+
+    // 明确禁用缓存（强制刷新时重新请求）
+    const res = await clientFetch(fullUrl, {
+      headers: { cookie: cookieHeader },
+      // next: { revalidate: 0 }, // 禁用缓存，每次请求都重新获取
+    });
+
+    // 检查响应是否成功
+    if (!res.ok) {
+      throw new Error(`请求失败: ${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    return needText ? data : parse(data);
+  } catch (error) {
+    console.error("getConf 执行出错:", error);
+    // 出错时返回兜底值，避免组件接收 undefined
+    return false;
+  }
 };
 export const updateConf = async (val?: string) => {
   if (!val) return false;
   try {
     const header = await headers();
-    const referer = header.get("referer") || "";
-    if (!referer) return false;
-    const url = new URL(referer);
-    const fullUrl = `${url.origin}/frp-api/config`;
+    const fullUrl = `${getServerBasicUrl(header)}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
     const res = await clientFetch(fullUrl, {
       method: "PUT",
@@ -132,8 +141,6 @@ export const updateConf = async (val?: string) => {
       },
       body: val,
     });
-    const data = await res.json();
-    console.log("data", data, res.ok);
     return res.ok;
   } catch (error) {
     return false;
@@ -144,10 +151,8 @@ export const updateAndReloadConf = async (val?: string) => {
   if (!val) return false;
   try {
     const header = await headers();
-    const referer = header.get("referer") || "";
-    if (!referer) return false;
-    const url = new URL(referer);
-    const fullUrl = `${url.origin}/frp-api/config`;
+    const url = getServerBasicUrl(header);
+    const fullUrl = `${url}/frp-api/config`;
     const cookieHeader = header.get("cookie") || "";
     const res = await clientFetch(fullUrl, {
       method: "PUT",
@@ -159,14 +164,13 @@ export const updateAndReloadConf = async (val?: string) => {
     revalidatePath("/manage/*");
     if (res.ok) {
       console.log("update success");
-      const reloadUrl = `${url.origin}/frp-api/reload`;
+      const reloadUrl = `${url}/frp-api/reload`;
       const res = await clientFetch(reloadUrl, {
         headers: {
           cookie: cookieHeader,
         },
       });
       const data = await res.json();
-      console.log("data", data, res.ok);
       return res.ok;
     }
     return false;

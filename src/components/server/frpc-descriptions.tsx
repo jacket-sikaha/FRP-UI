@@ -35,7 +35,6 @@ function FrpcDescriptions({
   items: Record<string, unknown>;
   bordered?: boolean;
 }) {
-  console.log(11111111, items);
   const itemsArray = Object.entries(items)
     .filter(([_, value]) => typeof value !== "object")
     .map(([key, value]) => ({

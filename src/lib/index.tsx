@@ -5,6 +5,16 @@ export const createBasicAuthHeader = (username: string, password: string) => {
   return `Basic ${base64Credentials}`;
 };
 
+export const getServerBasicUrl = (headers: Headers) => {
+  const host = headers.get("host");
+  const protocol = headers.get("x-forwarded-proto") || "http";
+  if (!host && !process.env.NEXT_PUBLIC_APP_HOST) {
+    console.error("请求头中未找到 host 信息，且未配置 NEXT_PUBLIC_APP_HOST");
+    throw new Error("请求头中未找到 host 信息，且未配置 NEXT_PUBLIC_APP_HOST");
+  }
+  return `${protocol}://${host}` || process.env.NEXT_PUBLIC_APP_HOST;
+};
+
 export const obj2FormList = (obj: Record<string, unknown>) => {
   return Object.entries(obj).map(([key, value]) => ({ key, value }));
 };
