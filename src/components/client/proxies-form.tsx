@@ -5,7 +5,7 @@ import { updateAndReloadConf } from "@/lib/server-action";
 import { ProxyBaseConfig } from "@/types/proxies";
 import { App, Button, Form, Input, message, Select } from "antd";
 import { produce } from "immer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { stringify } from "smol-toml";
 import DrawerContainer, {
   DrawerContainerProps,
@@ -30,8 +30,17 @@ function ProxiesForm({
 }: { value?: ProxyBaseConfig } & DrawerContainerProps) {
   const { message, modal } = App.useApp();
   const { config, setConfig } = useFrpcConf();
+  const [showRemotePort, setShowRemotePort] = useState(false);
+  const [showDomainConfig, setShowDomainConfig] = useState(false);
   const [form] = Form.useForm<Record<string, unknown>>();
   const onFinish = async (val: Record<string, unknown>) => {
+    if (!showRemotePort) {
+      delete val["remotePort"];
+    }
+    if (!showDomainConfig) {
+      delete val["subdomain"];
+      delete val["customDomains"];
+    }
     const data = Object.fromEntries(
       Object.entries(val).map(([key, value]) => [
         key,
@@ -66,6 +75,10 @@ function ProxiesForm({
       onClose?.();
     }
   };
+  const handleTypeChange = (type: string) => {
+    setShowRemotePort(["tcp", "udp"].includes(type));
+    setShowDomainConfig(["http", "https", "tcpmux"].includes(type));
+  };
 
   useEffect(() => {
     if (!value || !show) return;
@@ -83,6 +96,7 @@ function ProxiesForm({
     const timer = setTimeout(() => {
       form.setFieldsValue(data);
     }, 0);
+    handleTypeChange(data.type);
     return () => {
       clearTimeout(timer);
     };
@@ -109,9 +123,14 @@ function ProxiesForm({
                 label: value,
                 value,
               }))}
+              onChange={(val) => handleTypeChange(val)}
             />
           </Form.Item>
-          <Form.Item label="远程端口 (remotePort)" name="remotePort">
+          <Form.Item
+            label="远程端口 (remotePort)"
+            name="remotePort"
+            hidden={!showRemotePort}
+          >
             <Input />
           </Form.Item>
           <Form.Item label="被代理的本地服务IP (localIP)" name="localIP">
@@ -120,16 +139,22 @@ function ProxiesForm({
           <Form.Item label="被代理的本地服务端口 (localPort)" name="localPort">
             <Input />
           </Form.Item>
-          <Form.Item label="子域名 (subdomain)" name="subdomain">
+          <Form.Item
+            label="子域名 (subdomain)"
+            name="subdomain"
+            hidden={!showDomainConfig}
+          >
             <Input />
           </Form.Item>
 
+          {showDomainConfig && (
+            <ObjInputFormList
+              name="customDomains"
+              title="自定义域名列表 (customDomains)"
+              isArray
+            />
+          )}
           <ObjInputFormList name="plugin" title="客户端插件配置 (plugin)" />
-          <ObjInputFormList
-            name="customDomains"
-            title="自定义域名列表 (customDomains)"
-            isArray
-          />
           <ObjInputFormList
             name="transport"
             title="代理网络层配置 (transport)"
