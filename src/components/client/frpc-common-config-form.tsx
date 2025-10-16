@@ -22,7 +22,9 @@ function FrpcCommonConfigForm() {
           ? ["includes", "start"].includes(key)
             ? formList2Arr(value as { value: string }[])
             : formList2Obj(value as { key: string; value: unknown }[])
-          : value,
+          : !!value
+          ? value
+          : undefined,
       ])
     );
     try {
