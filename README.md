@@ -1,105 +1,145 @@
-# frp-ui
+# FRP-UI
 
-基于 frp 的服务端部分 API 定制化自己的客户端
+**View English Documentation**: [README_EN.md](README_EN.md)
 
-## 数据结构
+<div align="center">
+  <a href="https://github.com/sikaha/FRP-UI">
+    <img src="https://raw.githubusercontent.com/fatedier/frp/master/docs/_static/logo.png" alt="FRP Logo" height="80">
+  </a>
+  <p>
+    <b>基于FRP的现代化、用户友好的管理界面</b>
+  </p>
+</div>
 
-- FRP 配置服务状态 http://127.0.0.1/api/status（GET获取状态数据）
+## 📋 项目概述
 
-- FRP 服务器配置
-  token = （服务端 token）
-  server_addr = （服务器端 IP 地址）
-  server_port = （服务器端端口）
-  admin_addr = （原生 WEB 客户端 IP 地址）
-  admin_port = （原生 WEB 客户端端口）
+FRP-UI是一个基于FRP 的现代化管理界面，提供直观易用的方式来配置和管理FRP代理服务。本项目使用Next.js 15和Ant Design 5构建，支持用户认证、代理配置管理、状态监控等功能。
 
-- FRP 客户端配置
-  必填：
-  type = （协议类型）
-  local_ip = （内网主机 IP）
-  local_port = （内网主机端口）
-  remote_port = （远端端口）
+## 🚀 主要功能
 
-  frpc-name = 配置名称 **不能有中文**
+- ✅ 用户认证系统，保障配置安全
+- ✅ FRP代理状态实时监控
+- ✅ 代理配置可视化管理（添加、编辑、删除）
+- ✅ 支持多种代理类型（TCP, UDP, HTTP, HTTPS等）
+- ✅ 配置文件在线编辑
+- ✅ 配置实时重载
+- ✅ Docker容器化部署
 
-- FRP 配置文件编辑
+## 🛠️ 技术栈
 
-- 注意点：
+| 技术/框架 | 版本 | 用途 |
+|----------|------|------|
+| Next.js | ^15.5.2 | React框架 |
+| React | ^19.1.0 | UI库 |
+| Ant Design | ^5.27.1 | UI组件库 |
+| TypeScript | ^5 | 类型系统 |
+| Tailwind CSS | ^4 | 样式框架 |
+| NextAuth.js | ^5.0.0-beta.29 | 认证系统 |
+| smol-toml | 1.4.2 | TOML配置解析 |
+| react-query | 3.39.3 | 数据请求管理 |
+| immer | 10.1.3 | 不可变数据管理 |
 
-1. 必填字段根据情况变化：
+## 📦 安装与部署
 
-   tcp/udp =》remote_port
+### Docker部署（推荐）
 
-   http =》 vhost_http_port
+```bash
+docker-compose up -d
+```
 
-   https =》 vhost_https_port
+### Docker Compose配置示例
 
-2. 可选字段不能重复，全部同理
+```yaml
+version: "3.8"
 
-3. 客户端配置名称不能重复
+services:
+  frp-ui:
+    image: docker.io/sikaha/frp-ui:latest
+    container_name: frp-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - ORIGIN_SERVER=http://localhost:3000  # FRP服务器API地址
+      - AUTH_SECRET=your-secret  # 替换为实际的AUTH_SECRET
+    restart: unless-stopped
+    networks:
+      - frp-network
 
-4. 顺序必填在先，自定义后面（全部同理）
+networks:
+  frp-network:
+    driver: bridge
+```
 
-5. 自定义字段的键值不能有中文，特殊字符
+### 本地开发
 
-- 选项管理 Collapse 组件
-  1. 添加/删除都在这一页
-  2. **客户端**的编辑都会有选项提示，他的每次点击编辑，数据库都会有 name 的变化 ，用 set
-  3.
+```bash
+# 安装依赖
+pnpm install
 
-## 接口
+# 生成认证密钥
+pnpm auth
 
-http://127.0.0.1/api/status（GET获取状态数据）
-http://127.0.0.1/api/config（GET获取文件数据）（PUT上传文件数据）
-http://127.0.0.1/api/reload（GET重载）
+# 启动开发服务器
+pnpm dev
 
-## 参考图片
+# 构建生产版本
+pnpm build
 
-- 添加表单---编辑里不允许自定义添加相同配置
+# 启动生产服务器
+pnpm start
+```
 
-  ![add](http://dns.huagecloud.top:8097/api/files/1686039918717.png)
+## 🔧 环境变量配置
 
-- 客户端配置表格显示
+| 环境变量 | 描述 | 默认值 |
+|---------|------|--------|
+| ORIGIN_SERVER | FRP服务器API地址 | - |
+| AUTH_SECRET | NextAuth.js认证密钥 | - |
+| PORT | 应用端口 | 3000 |
 
-  ![table](http://dns.huagecloud.top:8097/api/files/1686039955796.png)
+## 📱 界面功能介绍
 
-- 服务端配置表格显示
+### 1. 状态监控页面
 
-  ![table2](http://dns.huagecloud.top:8097/api/files/1686039961145.png)
+展示所有FRP代理的运行状态，包括代理名称、协议类型、本地地址、远程地址和运行状态等信息。
 
-- 选项管理 - 选项显示配置名称，即那条数据在使用这个选项
+### 2. 代理配置管理
 
-- ![配置状态](http://dns.huagecloud.top:8097/api/files/1686239263788.png)
+提供直观的界面来添加、编辑和删除FRP代理配置，支持多种代理类型和高级配置选项。
 
-[common]
-server_addr = xxxxxxxxxxxxx
-server_port = xxxxxxxxxxxx
-admin_addr = 10.10.10.204
-admin_port = xxxxxxxxx
-#admin_user = xxxxxx
-#admin_pwd = xxxxxxxxxxxx
+### 3. 配置文件编辑
 
-[FRP_WEB_UI123]
-type = tcp
-local_ip = 10.10.10.204
-local_port = 1001
-remote_port = 14725
+提供在线编辑器，支持直接编辑FRP配置文件，实时更新配置。
 
-[frp-web12]
-type = http
-local_ip = 10.10.10.204
-local_port = 8889
-vhost_http_port = 80
-vhost_https_port = 443
-custom_domains = xxxxxxxxxxxx
+## 📡 API接口
 
-## linux 服务器测试待解决问题
+FRP-UI与FRP服务器通过以下API接口交互：
 
-##### 客户端配置的可选选项带注释的显示逻辑（注释了就不在编辑 modal 显示，反之显示）
+- `GET /api/status` - 获取FRP代理状态
+- `GET /api/config` - 获取FRP配置文件
+- `PUT /api/config` - 更新FRP配置文件
+- `GET /api/reload` - 重载FRP配置
 
-##### 自定义配置选项删除前做个提示，并且配置文件原有就有的选项添加完成后自动读取文件同步一次数据
+## 📝 注意事项
 
-##### 文件读取同步选项的算法有问题，原本就有的选项为 0 了会直接删除了而不是 key:[]存储
+1. 代理名称不能包含中文字符
+2. 必填字段根据代理类型不同而变化：
+   - TCP/UDP代理需要设置remote_port
+   - HTTP代理需要设置vhost_http_port
+   - HTTPS代理需要设置vhost_https_port
+3. 代理配置名称不能重复
+4. 自定义字段的键值不能包含中文字符和特殊字符
 
-##### 客户端配置必选项值不能有英文
+## 🤝 贡献
+
+欢迎提交Issue和Pull Request来改进FRP-UI！
+
+## 📄 许可证
+
+本项目采用MIT许可证 - 详情请查看[LICENSE](LICENSE)文件
+
+## 📞 联系
+
+如有问题或建议，请在GitHub仓库提交Issue。
+
 
