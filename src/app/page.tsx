@@ -27,7 +27,7 @@ export default function Index() {
             go to manage
           </Button>
         </div>
-        <div className="flex flex-col rounded-md bg-red-100 text-black">
+        <div className="flex flex-col rounded-md bg-red-100 text-green-200">
           <div className="rounded-t-md bg-yellow-200 p-4 font-bold">
             Current Session
           </div>

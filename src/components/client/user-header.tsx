@@ -5,10 +5,13 @@ import { Avatar, Dropdown, MenuProps } from "antd";
 import { User } from "next-auth";
 import { useSession } from "next-auth/react";
 import React from "react";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { useTheme } from "@/context";
 
 function UserHeader() {
   const { data: session } = useSession();
   const user = session?.user as User & { username: string };
+  const { theme, setTheme } = useTheme();
   const items: MenuProps["items"] = [
     {
       label: (
@@ -42,16 +45,20 @@ function UserHeader() {
   ];
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="shadow-sm">
       <div className="px-10">
         <div className="flex justify-between items-center h-12">
           <div className="flex items-center w-10">
-            <a href="#" className="flex items-center">
-              <span className="font-bold text-gray-800">Brand</span>
-            </a>
+            <div className="flex items-center font-bold">Brand</div>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            <div
+              onClick={() => setTheme?.(theme === "dark" ? "light" : "dark")}
+              className="flex items-center justify-center size-8"
+            >
+              {theme === "dark" ? <MoonOutlined /> : <SunOutlined />}
+            </div>
             <div className="relative group">
               {user && (
                 <Dropdown
@@ -69,7 +76,7 @@ function UserHeader() {
                     >
                       {user?.username.slice(0, 2)}
                     </Avatar>
-                    <span className="text-sm font-medium text-gray-800 hidden sm:inline">
+                    <span className="text-sm font-medium hidden sm:block">
                       {user?.username}
                     </span>
                   </button>

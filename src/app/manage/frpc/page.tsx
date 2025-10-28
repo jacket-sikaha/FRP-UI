@@ -7,7 +7,7 @@ export default async function FrpcViewPage() {
   const data = (await getConf()) || {};
   const { proxies, ...frpc } = data;
   return (
-    <div className="p-3 space-y-5 bg-white">
+    <div className="p-3 space-y-5">
       <FrpcConfDrawer value={data as FrpcConfig} />
       <FrpcDescriptions bordered items={frpc} />
     </div>

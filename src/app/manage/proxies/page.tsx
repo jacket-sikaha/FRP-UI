@@ -15,7 +15,7 @@ export default async function EditProxiesPage() {
 
   console.log("EditProxiesPage", data);
   return (
-    <div className="w-full p-3 h-full flex flex-col items-center bg-white">
+    <div className="w-full p-3 h-full flex flex-col items-center">
       <DynamicTable frpc={frpc} />
     </div>
   );

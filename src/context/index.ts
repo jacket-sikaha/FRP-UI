@@ -11,3 +11,14 @@ export const FrpcConfCtx = createContext<{
 );
 
 export const useFrpcConf = () => useContext(FrpcConfCtx);
+
+export const ThemeCtx = createContext<{
+  theme: "light" | "dark";
+  setTheme?: (theme: "light" | "dark") => void;
+}>(
+  {} as {
+    theme: "light" | "dark";
+  }
+);
+
+export const useTheme = () => useContext(ThemeCtx);

@@ -6,10 +6,9 @@ const { Header, Content, Footer, Sider } = Layout;
 function ServerSlider() {
   return (
     <div>
-      <Sider breakpoint="lg" collapsedWidth="0" className="h-full py-2">
+      <Sider breakpoint="lg" collapsedWidth="0" className="">
         <Menu
           className="sticky top-0"
-          theme="dark"
           mode="inline"
           defaultSelectedKeys={["1"]}
           items={[

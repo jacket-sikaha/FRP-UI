@@ -32,3 +32,12 @@ export const formList2Arr = (arr: { value: string }[]) => {
   if (!arr || arr.length === 0) return undefined;
   return arr.map((item) => item.value);
 };
+
+export const getSystemTheme = (): "light" | "dark" => {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};

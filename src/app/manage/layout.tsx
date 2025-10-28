@@ -1,7 +1,8 @@
 "use client";
 
 import ServerSlider from "@/components/server/slider";
-import { App, Layout, Spin, theme } from "antd";
+import { useTheme } from "@/context";
+import { App, ConfigProvider, Layout, Spin, theme as antdTheme } from "antd";
 import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 const { Header, Content, Footer, Sider } = Layout;
@@ -20,24 +21,32 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-
+  // const {
+  //   token: { colorBgContainer },
+  // } = theme.useToken();
+  const { theme } = useTheme();
   return (
     <Suspense fallback={<Spin fullscreen />}>
-      <div className="grid grid-cols-[auto_1fr] w-full h-full">
-        <ServerSlider />
-
-        <div className="p-3 bg-slate-100">
-          {/* // 提供 client 至 App */}
-          <App>
-            <QueryClientProvider client={queryClient}>
-              <Content>{children}</Content>
-            </QueryClientProvider>
-          </App>
-        </div>
-      </div>
+      <App>
+        <ConfigProvider
+          theme={{
+            algorithm:
+              theme === "dark"
+                ? antdTheme.darkAlgorithm
+                : antdTheme.defaultAlgorithm,
+          }}
+        >
+          <div className="grid grid-cols-[auto_1fr] w-full h-full">
+            <ServerSlider />
+            <div className="p-3">
+              {/* // 提供 client 至 App */}
+              <QueryClientProvider client={queryClient}>
+                <Content>{children}</Content>
+              </QueryClientProvider>
+            </div>
+          </div>
+        </ConfigProvider>
+      </App>
     </Suspense>
   );
 }
