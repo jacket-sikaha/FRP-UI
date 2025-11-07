@@ -5,7 +5,7 @@ import { proxiesZh } from "@/types/proxies-zh";
 import { App, Button, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
-import { useMemo, useRef, useState } from "react";
+import { use, useMemo, useRef, useState } from "react";
 import ProxiesForm from "./proxies-form";
 import { FrpcConfCtx } from "@/context";
 import { FrpcConfig } from "@/types/frpc";
@@ -14,13 +14,8 @@ import { stringify } from "smol-toml";
 import { produce } from "immer";
 import { DrawerContainerProps } from "./drawer-container";
 
-function DynamicTable({
-  frpc = {
-    proxies: [],
-  },
-}: {
-  frpc: FrpcConfig;
-}) {
+function DynamicTable({ frpcPromise }: { frpcPromise: Promise<FrpcConfig> }) {
+  const frpc = use(frpcPromise);
   const { proxies = [] } = frpc;
 
   const { message, modal } = App.useApp();

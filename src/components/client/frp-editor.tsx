@@ -1,10 +1,17 @@
 "use client";
-import { useRef, useState } from "react";
+import { use, useRef, useState } from "react";
 import CodeMirrorEditor, { EditorRefType } from "./editor-view";
 import { App, Button, message, Spin } from "antd";
 import { reloadConf, updateConf } from "@/lib/server-action";
 
-function FrpEditor({ value = "", height = "300" }) {
+function FrpEditor({
+  frpcPromise,
+  height = "300",
+}: {
+  frpcPromise: Promise<string>;
+  height?: string;
+}) {
+  const value = use(frpcPromise);
   const editorRef = useRef<EditorRefType>(null);
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
