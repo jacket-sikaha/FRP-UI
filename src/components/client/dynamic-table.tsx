@@ -2,7 +2,7 @@
 
 import { ProxyBaseConfig } from "@/types/proxies";
 import { proxiesZh } from "@/types/proxies-zh";
-import { App, Button, message, Modal, Table, Tooltip } from "antd";
+import { App, Button, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import FrpcDescriptions from "../server/frpc-descriptions";
 import { useMemo, useRef, useState } from "react";
@@ -12,6 +12,7 @@ import { FrpcConfig } from "@/types/frpc";
 import { updateAndReloadConf } from "@/lib/server-action";
 import { stringify } from "smol-toml";
 import { produce } from "immer";
+import { DrawerContainerProps } from "./drawer-container";
 
 function DynamicTable({
   frpc = {
@@ -21,9 +22,11 @@ function DynamicTable({
   frpc: FrpcConfig;
 }) {
   const { proxies = [] } = frpc;
-  const [show, setShow] = useState(false);
+
   const { message, modal } = App.useApp();
-  const tableItem = useRef<ProxyBaseConfig>(undefined);
+  const [tableItem, setTableItem] = useState<ProxyBaseConfig>();
+  const drawerRef = useRef(null) as unknown as DrawerContainerProps["ref"];
+
   const tmp = useMemo(() => Object.assign({}, ...proxies), []);
   const father = Object.entries(tmp).filter(
     ([key, value]) => typeof value !== "object"
@@ -66,8 +69,8 @@ function DynamicTable({
           <div className="flex items-center gap-2">
             <Button
               onClick={() => {
-                setShow(true);
-                tableItem.current = record as ProxyBaseConfig;
+                drawerRef.current?.onShow();
+                setTableItem(record as ProxyBaseConfig);
               }}
             >
               修改
@@ -103,18 +106,13 @@ function DynamicTable({
           className="py-3"
           type="primary"
           onClick={() => {
-            setShow(true);
-            tableItem.current = undefined;
+            drawerRef.current?.onShow();
+            setTableItem(undefined);
           }}
         >
           添加代理
         </Button>
-        <ProxiesForm
-          show={show}
-          value={tableItem.current}
-          size="default"
-          onClose={() => setShow(false)}
-        />
+        <ProxiesForm ref={drawerRef} value={tableItem} size="default" />
         <Table
           rowKey={"id"}
           columns={dynamicColumns}

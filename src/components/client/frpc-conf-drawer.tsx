@@ -1,13 +1,13 @@
 "use client";
+import { FrpcConfCtx } from "@/context";
 import { FrpcConfig } from "@/types/frpc";
 import { Button } from "antd";
-import { useState } from "react";
-import DrawerContainer from "../server/drawer-container";
+import { useRef } from "react";
+import DrawerContainer, { DrawerContainerProps } from "./drawer-container";
 import FrpcCommonConfigForm from "./frpc-common-config-form";
-import { FrpcConfCtx } from "@/context";
 
 function FrpcConfDrawer({ value }: { value?: FrpcConfig }) {
-  const [show, setShow] = useState(false);
+  const drawerRef = useRef(null) as unknown as DrawerContainerProps["ref"];
 
   return (
     <FrpcConfCtx.Provider
@@ -16,14 +16,10 @@ function FrpcConfDrawer({ value }: { value?: FrpcConfig }) {
       }}
     >
       <div>
-        <Button type="primary" onClick={() => setShow(true)}>
+        <Button type="primary" onClick={() => drawerRef.current?.onShow()}>
           修改基础配置
         </Button>
-        <DrawerContainer
-          show={show}
-          onClose={() => setShow(false)}
-          size="large"
-        >
+        <DrawerContainer ref={drawerRef} size="large">
           <FrpcCommonConfigForm />
         </DrawerContainer>
       </div>

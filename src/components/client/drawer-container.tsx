@@ -1,20 +1,40 @@
 import { Drawer, DrawerProps } from "antd";
-import { PropsWithChildren } from "react";
+import {
+  PropsWithChildren,
+  RefObject,
+  useImperativeHandle,
+  useState,
+} from "react";
 
 export type DrawerContainerProps = {
   title?: string;
-  show?: boolean;
   size?: DrawerProps["size"];
-  onClose?: () => void;
+  ref: RefObject<{
+    onShow: () => void;
+    onClose: () => void;
+  }>;
 };
 
 function DrawerContainer({
   children,
   title = "修改frp",
-  show = false,
   size = "default",
-  onClose,
+  ref,
 }: PropsWithChildren<DrawerContainerProps>) {
+  const [show, setShow] = useState(false);
+  const onClose = () => setShow(() => false);
+  const onShow = () => setShow(() => true);
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        onShow,
+        onClose,
+      };
+    },
+    []
+  );
+
   return (
     <Drawer
       destroyOnHidden

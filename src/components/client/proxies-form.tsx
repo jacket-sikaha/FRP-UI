@@ -3,13 +3,11 @@ import { useFrpcConf } from "@/context";
 import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
 import { ProxyBaseConfig } from "@/types/proxies";
-import { App, Button, Form, Input, message, Select } from "antd";
+import { App, Button, Form, Input, Select } from "antd";
 import { produce } from "immer";
 import { useEffect, useState } from "react";
 import { stringify } from "smol-toml";
-import DrawerContainer, {
-  DrawerContainerProps,
-} from "../server/drawer-container";
+import DrawerContainer, { DrawerContainerProps } from "./drawer-container";
 import ObjInputFormList from "./obj-input-form-list";
 
 const ProxiesType = [
@@ -24,12 +22,12 @@ const ProxiesType = [
 ];
 function ProxiesForm({
   value,
-  show,
   size,
-  onClose,
+  ref,
 }: { value?: ProxyBaseConfig } & DrawerContainerProps) {
   const { message, modal } = App.useApp();
   const { config, setConfig } = useFrpcConf();
+
   const [showRemotePort, setShowRemotePort] = useState(false);
   const [showDomainConfig, setShowDomainConfig] = useState(false);
   const [form] = Form.useForm<Record<string, unknown>>();
@@ -72,7 +70,7 @@ function ProxiesForm({
     } catch (error) {
       message.error("提交失败");
     } finally {
-      onClose?.();
+      ref.current?.onClose();
     }
   };
   const handleTypeChange = (type: string) => {
@@ -81,7 +79,7 @@ function ProxiesForm({
   };
 
   useEffect(() => {
-    if (!value || !show) return;
+    if (!value) return;
     const data = Object.fromEntries(
       Object.entries(value).map(([key, val]) => [
         key,
@@ -100,11 +98,11 @@ function ProxiesForm({
     return () => {
       clearTimeout(timer);
     };
-  }, [show]);
+  }, [value]);
 
   return (
     <div>
-      <DrawerContainer show={show} onClose={onClose} size={size}>
+      <DrawerContainer size={size} ref={ref}>
         <Form name="proxies" clearOnDestroy form={form} onFinish={onFinish}>
           <Form.Item
             label="代理名称 (name)"
