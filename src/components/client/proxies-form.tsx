@@ -3,7 +3,7 @@ import { useFrpcConf } from "@/context";
 import { arr2FormList, formList2Arr, formList2Obj, obj2FormList } from "@/lib";
 import { updateAndReloadConf } from "@/lib/server-action";
 import { ProxyBaseConfig } from "@/types/proxies";
-import { App, Button, Form, Input, Select } from "antd";
+import { App, Button, Form, Input, InputNumber, Select } from "antd";
 import { produce } from "immer";
 import { useEffect, useState } from "react";
 import { stringify } from "smol-toml";
@@ -129,13 +129,13 @@ function ProxiesForm({
             name="remotePort"
             hidden={!showRemotePort}
           >
-            <Input />
+            <InputNumber min={0} />
           </Form.Item>
           <Form.Item label="被代理的本地服务IP (localIP)" name="localIP">
             <Input />
           </Form.Item>
           <Form.Item label="被代理的本地服务端口 (localPort)" name="localPort">
-            <Input />
+            <InputNumber min={0} />
           </Form.Item>
           <Form.Item
             label="子域名 (subdomain)"
