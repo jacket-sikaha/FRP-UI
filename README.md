@@ -2,6 +2,8 @@
 
 **View English Documentation**: [README_EN.md](README_EN.md)
 
+[![DeepWiki Index](https://deepwiki.com/badge.svg)](https://deepwiki.com/jacket-sikaha/FRP-UI)
+
 <div align="center">
   <a href="https://github.com/sikaha/FRP-UI">
     <img src="https://raw.githubusercontent.com/fatedier/frp/master/docs/_static/logo.png" alt="FRP Logo" height="80">
