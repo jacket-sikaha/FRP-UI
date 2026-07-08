@@ -50,11 +50,13 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5 # 注意版本可能需要更新
+        uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}} # 确保这里格式正确
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           tags: |
             type=semver,pattern={{version}}
+            # 手动触发时生成测试 tag：test-<时间戳>
+            type=raw,value=test-{{date 'YYYYMMDDHHmmss'}},enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
