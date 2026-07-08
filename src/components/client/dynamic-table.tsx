@@ -24,7 +24,7 @@ function DynamicTable({ frpcPromise }: { frpcPromise: Promise<FrpcConfig> }) {
 
   const tmp = useMemo(() => Object.assign({}, ...proxies), []);
   const father = Object.entries(tmp).filter(
-    ([key, value]) => typeof value !== "object"
+    ([key, value]) => typeof value !== "object",
   );
 
   const onDelete = async (id: string) => {
@@ -65,7 +65,7 @@ function DynamicTable({ frpcPromise }: { frpcPromise: Promise<FrpcConfig> }) {
             <Button
               onClick={() => {
                 drawerRef.current?.onShow();
-                setTableItem(record as ProxyBaseConfig);
+                setTableItem(() => ({ ...record }) as ProxyBaseConfig);
               }}
             >
               修改
@@ -115,7 +115,7 @@ function DynamicTable({ frpcPromise }: { frpcPromise: Promise<FrpcConfig> }) {
           expandable={{
             rowExpandable: (record) =>
               Object.entries(record).some(
-                ([key, value]) => typeof value === "object"
+                ([key, value]) => typeof value === "object",
               ),
             expandedRowRender: (record, idx) => (
               <FrpcDescriptions
@@ -123,8 +123,8 @@ function DynamicTable({ frpcPromise }: { frpcPromise: Promise<FrpcConfig> }) {
                 bordered
                 items={Object.fromEntries(
                   Object.entries(record).filter(
-                    ([key, value]) => typeof value === "object"
-                  )
+                    ([key, value]) => typeof value === "object",
+                  ),
                 )}
               />
             ),

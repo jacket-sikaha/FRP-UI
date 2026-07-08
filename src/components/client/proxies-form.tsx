@@ -47,9 +47,9 @@ function ProxiesForm({
             ? formList2Arr(value as { value: string }[])
             : formList2Obj(value as { key: string; value: unknown }[])
           : !!value
-          ? value
-          : undefined,
-      ])
+            ? value
+            : undefined,
+      ]),
     );
     try {
       const newFrpc = produce(config, (draft) => {
@@ -79,7 +79,10 @@ function ProxiesForm({
   };
 
   useEffect(() => {
-    if (!value) return;
+    if (!value) {
+      form.resetFields();
+      return;
+    }
     const data = Object.fromEntries(
       Object.entries(value).map(([key, val]) => [
         key,
@@ -87,8 +90,8 @@ function ProxiesForm({
           ? Array.isArray(val)
             ? arr2FormList(val)
             : obj2FormList(val as Record<string, unknown>)
-          : val ?? "--",
-      ])
+          : (val ?? "--"),
+      ]),
     );
     // 延迟设置，确保组件已渲染
     const timer = setTimeout(() => {
@@ -98,7 +101,7 @@ function ProxiesForm({
     return () => {
       clearTimeout(timer);
     };
-  }, [value]);
+  }, [form, value]);
 
   return (
     <div>

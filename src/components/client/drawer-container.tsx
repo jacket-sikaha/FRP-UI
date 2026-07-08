@@ -1,3 +1,5 @@
+"use client";
+
 import { Drawer, DrawerProps } from "antd";
 import {
   PropsWithChildren,
@@ -24,16 +26,12 @@ function DrawerContainer({
   const [show, setShow] = useState(false);
   const onClose = () => setShow(() => false);
   const onShow = () => setShow(() => true);
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        onShow,
-        onClose,
-      };
-    },
-    []
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      onShow,
+      onClose,
+    };
+  }, []);
 
   return (
     <Drawer
